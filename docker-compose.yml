@@ -1,26 +1,24 @@
-# 1. Specify the version for docker-compose.yml
 version: "3.8"
-
-# 2. Generate the services needed (redis)
 services:
-  redis:
-    container_name: "redis-db"
-    image: redis:alpine
+  db:
+    container_name: "postgres"
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - "6379:6379"
-    # map the volumes to that redis has the custom conf file from this project.
+      - '5438:5432'
     volumes:
-      - $PWD/models/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
-
-  go:
-    container_name: "go-server"
-    build:
-      # build the image using the Dockerfile we have in this project. Can use an image instead.
-      context: .
-    networks:
-      - redisison
-    ports:
-      - "4300:4300"
-networks:
-  redisison:
+      - postgres_data:/var/lib/postgresql/data
+      - ./models/db.sql:/docker-entrypoint-initdb.d/create_tables.sql
+  backend:
+   container_name: "go-service"
+   build:
+     # build the image using the Dockerfile we have in this project. Can use an image instead.
+     context: .
+   ports:
+     - "4300:4300"
+volumes:
+  postgres_data:
+    driver: local

@@ -7,6 +7,6 @@ COPY . .
 # Obtain the package needed to run redis commands. Alternatively use GO Modules.
 RUN go get ./...
 # Compile the binary exe for our app.
-RUN go build -o main .
+RUN go build .
 # Start the application.
 CMD ["./main"]
