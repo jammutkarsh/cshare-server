@@ -3,7 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
+	"github.com/JammUtkarsh/cshare-server/utils"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -18,27 +18,20 @@ type dbConfig struct {
 	Name     string
 }
 
-type users struct {
-	userID   int64
-	username string
+type Users struct {
+	UserID   int64
+	Username string
 }
 
-type clipStack struct {
+type ClipStack struct {
 	userID  int64
 	clipID  int64
 	message string
 	secret  bool
 }
 
-func loadEnv() {
-	err := godotenv.Load(`./db.env`)
-	if err != nil {
-		log.Fatalf("error loading db.env file: %s", err.Error())
-	}
-}
-
 func getConfig() *dbConfig {
-	loadEnv()
+	utils.LoadEnv(`./db.env`)
 	dbHost := os.Getenv("DB_HOST")
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
 	dbName := os.Getenv("DB_DATABASE")
@@ -63,6 +56,15 @@ func CreateConnection() *sql.DB {
 	if err != nil {
 		panic(err)
 	}
-
+	_, err = db.Exec(`\c cshare`)
 	return db
+}
+
+func CloseConnection(db *sql.DB) {
+	defer func() {
+		err := db.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}()
 }

@@ -2,7 +2,9 @@ version: "3.8"
 services:
   db:
     container_name: "postgres"
-    image: postgres
+    build:
+      # build the image using the Dockerfile we have in this project. Can use an image instead.
+      context: postgresFile
     restart: always
     environment:
       - POSTGRES_USER=postgres
