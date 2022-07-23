@@ -1,7 +1,7 @@
 -- DROP TABLE clip_stack;
 -- DROP TABLE users;
 -- DROP DATABASE cshare;
-CREATE DATABASE cshare;
+-- CREATE DATABASE cshare;
 CREATE TABLE  users(
     user_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username VARCHAR(150) UNIQUE NOT NULL
@@ -17,7 +17,6 @@ CREATE TABLE  clip_stack
         FOREIGN KEY(user_id)
             REFERENCES users(user_id)
 );
-
 -- -- Test Data users
 -- INSERT INTO users(username) VALUES ('koko');
 -- INSERT INTO users(username) VALUES ('serpent');

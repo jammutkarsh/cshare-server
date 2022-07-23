@@ -3,11 +3,12 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/JammUtkarsh/cshare-server/utils"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/JammUtkarsh/cshare-server/utils"
+	_ "github.com/lib/pq"
 )
 
 type dbConfig struct {
@@ -24,14 +25,14 @@ type Users struct {
 }
 
 type ClipStack struct {
-	userID  int64
-	clipID  int64
-	message string
-	secret  bool
+	UserID  int64
+	ClipID  int64
+	Message string
+	Secret  bool
 }
 
 func getConfig() *dbConfig {
-	utils.LoadEnv(`./db.env`)
+	utils.LoadEnv(`./.env`)
 	dbHost := os.Getenv("DB_HOST")
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
 	dbName := os.Getenv("DB_DATABASE")
@@ -47,6 +48,8 @@ func getConfig() *dbConfig {
 	}
 }
 
+// CreateConnection creates a connection to the database. It returns a pointer to the database.
+// Don't forget to close the connection when you are done using it. Using CloseConnection() function.
 func CreateConnection() *sql.DB {
 	configs := getConfig()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -56,10 +59,10 @@ func CreateConnection() *sql.DB {
 	if err != nil {
 		panic(err)
 	}
-	_, err = db.Exec(`\c cshare`)
 	return db
 }
 
+// CloseConnection closes the connection to the database. It takes a pointer to the database as argument.
 func CloseConnection(db *sql.DB) {
 	defer func() {
 		err := db.Close()

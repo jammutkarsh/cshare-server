@@ -1,130 +1,100 @@
 package models
 
-import (
-	"database/sql"
-	"log"
-)
+import "database/sql"
 
 const (
-	insert           = `INSERT INTO users(username) VALUES ($1) RETURNING user_id;`
-	selectByUsername = `SELECT * FROM users WHERE username=$1;`
-	selectByID       = `SELECT * FROM users WHERE user_id=$1;`
+	insertUser       = `INSERT INTO users(username) VALUES ($1) RETURNING user_id;`
+	selectByUsername = `SELECT user_id FROM users WHERE username=$1;`
+	selectByUserID   = `SELECT username FROM users WHERE user_id=$1;`
 	updateByUsername = `UPDATE users SET username=$1 WHERE username=$2;`
-	updateByID       = `UPDATE users SET username=$1 WHERE user_id=$2;`
+	updateByUserID   = `UPDATE users SET username=$1 WHERE user_id=$2;`
 	deleteByUsername = `DELETE FROM users WHERE username=$1;`
-	deleteByID       = `DELETE FROM users WHERE user_id=$1;`
+	deleteByUserID   = `DELETE FROM users WHERE user_id=$1;`
 )
 
-func Insert(u Users) (userID int64, err error) {
-	db := CreateConnection()
-	err = db.QueryRow(insert, u.Username).Scan(&userID)
+// InsertUser inserts a new user into the database and returns the user_id of the new user.
+//If the user already exists, it returns -1 and the error from DB.
+func InsertUser(db *sql.DB, uname string) (err error, userID int64) {
+	//db := CreateConnection()
+	err = db.QueryRow(insertUser, uname).Scan(&userID)
 	if err != nil {
-		log.Fatalln(err)
-		return -1, err
+		return err, -1
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return userID, nil
+	//CloseConnection(db)
+	return nil, userID
 }
 
-func SelectByUsername(username string) bool {
-	db := CreateConnection()
-	_, err := db.Exec(selectByUsername, username)
+//SelectByUsername checks if the user exists in database or not. If the user exists, it returns true.
+//If the user does not exist, it returns false with the error from DB.
+func SelectByUsername(db *sql.DB, uname string) (err error, userID int64) {
+	//db := CreateConnection()
+	err = db.QueryRow(selectByUsername, uname).Scan(&userID)
 	if err != nil {
-		log.Fatalln("Error selecting user by username:", err)
-		return false
+		return err, -1
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return true
+	//CloseConnection(db)
+	return nil, userID
 }
 
-// UpdateByUsername u is initial username && u2 is updated username
-func UpdateByUsername(u, v string) bool {
-	db := CreateConnection()
-	_, err := db.Exec(updateByUsername, u, v)
+// UpdateByUsername changes the username of an already existing user. It returns true for a successful update of user.
+//If the user does not exist, it returns false with the error from DB.
+func UpdateByUsername(db *sql.DB, initialName, finalName string) (err error, val bool) {
+	//db := CreateConnection()
+	_, err = db.Exec(updateByUsername, finalName, initialName)
 	if err != nil {
-		log.Fatalln("Error updating user by username:", err)
-		return false
+		return err, false
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return true
+	//CloseConnection(db)
+	return nil, true
 
 }
 
-func DeleteByUsername(u string) bool {
-	db := CreateConnection()
-	_, err := db.Exec(deleteByUsername, u)
+// DeleteByUsername deletes a user from the database. It returns true for a successful deletion of user.
+//If the user does not exist, it returns false with the error from DB.
+func DeleteByUsername(db *sql.DB, uname string) (err error, val bool) {
+	//db := CreateConnection()
+	_, err = db.Exec(deleteByUsername, uname)
 	if err != nil {
-		log.Fatalln("Error deleting user by username:", err)
-		return false
+		return err, false
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return true
+	//CloseConnection(db)
+	return nil, true
 }
 
-func SelectByID(id int64) bool {
-	db := CreateConnection()
-	_, err := db.Exec(selectByID, id)
+// <- Miscellaneous functions for testing purposes. ->
+
+// SelectByID checks if the user exists in database or not with user_id. If the user exists, it returns true.
+//If the user does not exist, it returns false with the error from DB.
+func SelectByID(db *sql.DB, id int64) (err error, val bool) {
+	//db := CreateConnection()
+	_, err = db.Exec(selectByUserID, id)
 	if err != nil {
-		log.Fatalln("Error selecting user by username:", err)
-		return false
+		return err, false
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return true
+	//CloseConnection(db)
+	return nil, true
 }
 
-func UpdateByID(u Users) bool {
-	db := CreateConnection()
-	_, err := db.Exec(updateByID, u.Username)
+// UpdateByID changes the username of an already existing user with user_id. It returns true for a successful update of user.
+//If the user does not exist, it returns false with the error from DB.
+func UpdateByID(db *sql.DB, u Users) (err error, val bool) {
+	//db := CreateConnection()
+	_, err = db.Exec(updateByUserID, u.Username, u.UserID)
 	if err != nil {
-		log.Fatalln("Error updating user by id:", err)
-		return false
+		return err, false
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return true
+	//CloseConnection(db)
+	return nil, true
 }
 
-func DeleteByID(id int64) bool {
-	db := CreateConnection()
-	_, err := db.Exec(deleteByID, id)
+// DeleteByID deletes a user from the database with user_id. It returns true for a successful deletion of user.
+//If the user does not exist, it returns false with the error from DB.
+func DeleteByID(db *sql.DB, id int64) (err error, val bool) {
+	//db := CreateConnection()
+	_, err = db.Exec(deleteByUserID, id)
 	if err != nil {
-		log.Fatalln("Error deleting user by id:", err)
-		return false
+		return err, false
 	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(db)
-	return true
+	//CloseConnection(db)
+	return nil, true
 }
