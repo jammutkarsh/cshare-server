@@ -1,65 +1,56 @@
-# create postgresql dockerfile
+# Postgres Database server setup
+FROM postgres:14-alpine AS backend-database
 
-FROM postgres:9.6
-
-ENV POSTGRES_USER nonadmin
 ENV POSTGRES_PASSWORD postingdata
+
 ENV POSTGRES_DB cshare
 
-RUN postgresql-setup initdb
-
-CMD ["postgresql-setup", "start"]
+ENV POSTGRES_PORT 5432
 
 EXPOSE 5432
+# init.sql is used here because this container is also used for testing pusposes.
+# idely, this file should be removed when the container is used for production. It should be in the docker-compose.yml file.
+COPY models/init.sql /docker-entrypoint-initdb.d/
 
-COPY . /docker-entrypoint-initdb.d
+# Start from golang base image
+FROM golang:alpine as builder
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENV GO111MODULE=on
 
-## create postgresql docker image
-#docker build -t postgresql .
-#
-## run postgresql docker image
-#docker run -d -p 5432:5432 --name postgresql postgresql
-#
-## connect to postgresql docker image
-#docker exec -it postgresql psql -U postgres -d postgres
-#
-## create postgresql database
-#CREATE DATABASE postgres;
-#
-## create postgresql user
-#CREATE USER postgres WITH PASSWORD 'postgres';
-#
-## grant privileges to postgresql user
-#GRANT ALL PRIVILEGES ON DATABASE postgres TO postgres;
-#
-## connect to postgresql docker image
-#docker exec -it postgresql psql -U postgres -d postgres
-#
-## create postgresql database
-#CREATE DATABASE postgres;
-#
-## create postgresql user
-#CREATE USER postgres WITH PASSWORD 'postgres';
-#
-## grant privileges to postgresql user
-#GRANT ALL PRIVILEGES ON DATABASE postgres TO postgres;
-#
-## connect to postgresql docker image
-#docker exec -it postgresql psql -U postgres -d postgres
-#
-## create postgresql database
-#CREATE DATABASE postgres;
-#
-## create postgresql user
-#CREATE USER postgres WITH PASSWORD 'postgres';
-#
-## grant privileges to postgresql user
-#GRANT ALL PRIVILEGES ON DATABASE postgres TO postgres;
-#
-## connect to postgresql docker image
-#docker exec -it postgresql psql -U postgres -d postgres
-#
-## create postgresql database
-#CREATE DATABASE postgres;
+# Add Maintainer info
+# LABEL maintainer="Utkarsh Chourasia<utkarshchourasia.in>"
+
+# Install git.
+# Git is required for fetching the dependencies.
+RUN apk update && apk add --no-cache git
+
+# Set the current working directory inside the container 
+WORKDIR /app
+
+# Copy go mod and sum files 
+COPY go.mod go.sum ./
+
+# Download all dependencies. Dependencies will be cached if the go.mod and the go.sum files are not changed 
+RUN go mod download 
+
+# Copy the source from the current directory to the working Directory inside the container 
+COPY . .
+
+# Build the Go app
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
+
+# Start a new stage from scratch
+FROM alpine:latest AS backend-server
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
+COPY --from=builder /app/main .
+COPY --from=builder /app/.env .       
+
+# Expose port 8080 to the outside world
+EXPOSE 8080
+
+#Command to run the executable
+CMD ["./server"]
