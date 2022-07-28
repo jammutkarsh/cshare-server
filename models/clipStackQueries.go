@@ -20,12 +20,12 @@ func GetUserID(db *sql.DB, username string) (err error, userID int64) {
 	if err != nil {
 		return err, -1
 	}
-	if userID == -1 {
-		err, userID = InsertUser(db, username)
-		if err != nil {
-			return nil, userID
-		}
-	}
+	//if userID == -1 {
+	//	err, userID = InsertUser(db, username)
+	//	if err != nil {
+	//		return nil, userID
+	//	}
+	//}
 	//CloseConnection(db)
 	return nil, userID
 }
@@ -42,9 +42,9 @@ func ClipCount(db *sql.DB, userID int64) (err error, count int64) {
 }
 
 // InsertClip inserts a new clip into the database and returns the clip_id of the new clip.
-func InsertClip(db *sql.DB, username string, c ClipStack) (err error, clipID int64) {
+func InsertClip(db *sql.DB, c ClipStack) (err error, clipID int64) {
 	//db := CreateConnection()
-	err, c.UserID = GetUserID(db, username)
+	err, c.UserID = GetUserID(db, c.Username)
 	if err != nil {
 		return err, -1
 	}

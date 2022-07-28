@@ -3,12 +3,11 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"github.com/JammUtkarsh/cshare-server/utils"
+	_ "github.com/lib/pq"
 	"log"
 	"os"
 	"strconv"
-
-	"github.com/JammUtkarsh/cshare-server/utils"
-	_ "github.com/lib/pq"
 )
 
 type dbConfig struct {
@@ -20,18 +19,24 @@ type dbConfig struct {
 }
 
 type Users struct {
+	// userID is the primary key of the table. It is autoincrement.
 	UserID   int64
-	Username string
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type ClipStack struct {
-	UserID  int64
-	ClipID  int64
-	Message string
-	Secret  bool
+	// userID && clipID is the composite primary key of the table.
+	// userID is the foreign key of the table.
+	UserID int64
+	// clipID is the is incremented by 1 every time a clip is added to the stack for each user.
+	ClipID   int64
+	Username string `json:"username" binding:"required"`
+	Message  string `json:"message" binding:"required"`
+	Secret   bool   `json:"secret" binding:"required"`
 }
 
-func getConfig() *dbConfig {
+func getDBConfig() *dbConfig {
 	utils.LoadEnv(`./.env`)
 	dbHost := os.Getenv("DB_HOST")
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
@@ -51,7 +56,7 @@ func getConfig() *dbConfig {
 // CreateConnection creates a connection to the database. It returns a pointer to the database.
 // Don't forget to close the connection when you are done using it. Using CloseConnection() function.
 func CreateConnection() *sql.DB {
-	configs := getConfig()
+	configs := getDBConfig()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		configs.Host, configs.Port, configs.Username, configs.Password, configs.Name)

@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/JammUtkarsh/cshare-server/routes"
 
+func main() {
+	routes.Routes()
 }

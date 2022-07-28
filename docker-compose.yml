@@ -14,11 +14,11 @@ services:
      context: .
      target: backend-server
    ports:
-     - "4300:4300"
+     - "5675:5675"
 volumes:
   postgres_data:
     driver: local
 
 
 # Add Networking in docker-compose.yml  to enable communication between containers.
-# Also update setting models/models.go with the correct IP address of the database and databse with server. 
+# Also update setting models/models.go with the correct IP address of the database and database with server.

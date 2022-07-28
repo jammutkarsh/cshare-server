@@ -65,9 +65,9 @@ func DeleteByUsername(db *sql.DB, uname string) (err error, val bool) {
 
 // SelectByID checks if the user exists in database or not with user_id. If the user exists, it returns true.
 //If the user does not exist, it returns false with the error from DB.
-func SelectByID(db *sql.DB, id int64) (err error, val bool) {
+func SelectByID(db *sql.DB, userId int64) (err error, val bool) {
 	//db := CreateConnection()
-	_, err = db.Exec(selectByUserID, id)
+	_, err = db.Exec(selectByUserID, userId)
 	if err != nil {
 		return err, false
 	}
@@ -89,9 +89,9 @@ func UpdateByID(db *sql.DB, u Users) (err error, val bool) {
 
 // DeleteByID deletes a user from the database with user_id. It returns true for a successful deletion of user.
 //If the user does not exist, it returns false with the error from DB.
-func DeleteByID(db *sql.DB, id int64) (err error, val bool) {
+func DeleteByID(db *sql.DB, userId int64) (err error, val bool) {
 	//db := CreateConnection()
-	_, err = db.Exec(deleteByUserID, id)
+	_, err = db.Exec(deleteByUserID, userId)
 	if err != nil {
 		return err, false
 	}
