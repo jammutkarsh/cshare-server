@@ -1,6 +1,6 @@
 # ⚠️ cShare Server
 
-Not complety functional for testing puposes only.
+Not complete functional for testing purposes only.
 
 _This project consumes port `5675` && `5432`_
 
@@ -18,13 +18,13 @@ Run Docker compose to initialize DB and application.
 docker compose up -d
 ```
 
-Open PostgreSQL shell
+Open PostgresSQL shell
 
 ```bash
 docker exec -it postgrestest psql -U cshare
 ```
 
-Now you can test the API's
+Now you can test the APIs
 
 ## Functional API Endpoints
 

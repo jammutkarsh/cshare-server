@@ -5,6 +5,9 @@ package controller
 // err + false = unauthorized
 // err + true = incorrect credentials
 // nil + true = authorized
+
+// These functions unmarshal the JSON data and un hash the password.
+
 func Authorize(username, password string) (error, bool) {
 
 	return nil, true

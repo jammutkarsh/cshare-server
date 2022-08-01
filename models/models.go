@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/JammUtkarsh/cshare-server/utils"
 	_ "github.com/lib/pq"
-	"log"
 	"os"
 	"strconv"
 )
@@ -62,6 +61,7 @@ func CreateConnection() *sql.DB {
 		configs.Host, configs.Port, configs.Username, configs.Password, configs.Name)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
+		utils.ErrorReaderWriter(err, CreateConnection)
 		panic(err)
 	}
 	return db
@@ -72,7 +72,7 @@ func CloseConnection(db *sql.DB) {
 	defer func() {
 		err := db.Close()
 		if err != nil {
-			log.Fatalln(err)
+			utils.ErrorReaderWriter(err, CloseConnection)
 		}
 	}()
 }

@@ -13,13 +13,13 @@ func SetUpRouter() *gin.Engine {
 
 var Routes = func() {
 	router := SetUpRouter()
-	router.POST("/login", controller.POSTLogin)
-	router.POST("/signup", controller.POSTSignUp)
-	router.POST("/postclip", controller.POSTClipData)
-	router.GET("/getclip/:username", controller.GETAllClipData)
-	router.GET("/getclip/:username/:clip_id", controller.GETClipData)
-	router.PUT("/updateusername/:username/:updated", controller.UPDATEChangeUsername)
-	router.DELETE("/deleteclip/:username/:clip_id", controller.DELETEClipData)
-	router.DELETE("/deleteall/:username", controller.DELETEAllClipData)
+	router.POST("v1/auth/login", controller.POSTLogin)
+	router.POST("v1/auth/signup", controller.POSTSignUp)
+	router.PATCH("v1/users/:username/:updated", controller.UPDATEChangeUsername)
+	router.PATCH("v1/users/:username", controller.UPDATEChangePassword)
+	router.POST("v1/clip/:username", controller.POSTClipData)
+	router.GET("v1/clip/:username/:clip_id", controller.GETClipData)
+	router.GET("v1/clips/:username", controller.GETAllClipData)
+	router.DELETE("v1/clips/:username/:username", controller.DELETEAllClipData)
 	log.Fatalln(router.Run(":5675"))
 }
