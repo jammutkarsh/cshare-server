@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/JammUtkarsh/cshare-server/models"
-	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -14,16 +13,11 @@ const (
 	credValidationErrType   = "credential_validation_error"
 	resourceNotFoundErrType = "resource_not_found_error"
 	userNotFoundErrType     = "user_not_found_error"
+	authErrType             = "authentication_error"
 	serviceErrType          = "service_error"
 )
 
-// TODO for all fmt.Errorf()
-// log error in a file or different format.
-// Avoid mixing these log with middleware logs.
-
 // TODO: for all 200 response codes, provide a better response to the client.
-
-// TODO: Use cont.body(send data in json format) to get the data from client and vise versa.
 
 // TODO: add headers to the response which include some auth token or other essential information.
 //<--User Authentication and Authorisation-->
@@ -31,15 +25,15 @@ const (
 // POSTLogin gets the user data from client and inserts it into the database for the first time.
 func POSTLogin(cont *gin.Context) {
 	var clientCredentials models.Users
-	if err := cont.BindJSON(&clientCredentials); err != nil {
+	if err := cont.BindJSON(&clientCredentials); err != nil { // checking if the json response is in the correct format.
 		cont.JSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
-		utils.ErrorReaderWriter(err, POSTLogin)
-	} else {
+		log.Println(err)
+	} else { // format is correct ; now checking if the credentials are correct.
 		err, val := Authenticate(clientCredentials.Username, clientCredentials.Password)
 		if val == false {
-			utils.ErrorReaderWriter(err, POSTLogin)
+			log.Println(err)
 			cont.JSON(http.StatusUnauthorized, gin.H{"status": credValidationErrType})
-		} else {
+		} else { // credentials are correct ; giving status:200 with auth token.
 			cont.JSON(http.StatusOK, gin.H{
 				"status":     val,
 				"username":   clientCredentials.Username,
@@ -51,19 +45,20 @@ func POSTLogin(cont *gin.Context) {
 }
 
 // POSTSignUp gets the user data from client and inserts it into the database for the first time.
+// TODO: rewrite the function after creating authentication system.
 func POSTSignUp(cont *gin.Context) {
 	db := models.CreateConnection()
 	var clientCredentials models.Users
-	// password is hashed and then marshaled to json before sending to the client.
 	if err := cont.BindJSON(&clientCredentials); err != nil {
 		cont.JSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
-		utils.ErrorReaderWriter(err, POSTSignUp)
+		log.Println(err)
 	} else {
 		err, _ := models.InsertUser(db, clientCredentials.Username)
+		log.Println(err)
 		err, val := Authorize(clientCredentials.Username, clientCredentials.Password)
 		if val == false {
-			cont.JSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
-			utils.ErrorReaderWriter(err, POSTSignUp)
+			cont.JSON(http.StatusUnauthorized, gin.H{"error": authErrType})
+			log.Println(err)
 		} else {
 			cont.JSON(http.StatusOK, gin.H{"status": val, "username": clientCredentials.Username})
 		}
@@ -77,10 +72,10 @@ func UPDATEChangeUsername(cont *gin.Context) {
 	finalName := cont.Param("updated")
 	if err, val := models.SelectByUsername(db, finalName); val != -1 {
 		cont.JSON(http.StatusBadRequest, gin.H{"error": userNotFoundErrType})
-		utils.ErrorReaderWriter(err, UPDATEChangeUsername)
+		log.Println(err)
 	} else {
 		err, _ := models.UpdateByUsername(db, initialName, finalName)
-		utils.ErrorReaderWriter(err, UPDATEChangeUsername)
+		log.Println(err)
 		cont.JSON(http.StatusOK, gin.H{"status": val})
 	}
 	models.CloseConnection(db)
@@ -103,15 +98,16 @@ func POSTClipData(cont *gin.Context) {
 	db := models.CreateConnection()
 	if err := cont.BindJSON(&clientData); err != nil {
 		cont.JSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
-		_ = fmt.Errorf("1  %v", err)
+		log.Println(err)
 	} else {
-		err, val := models.InsertClip(db, clientData)
-		utils.ErrorReaderWriter(err, POSTClipData)
+		username := cont.Param("username")
+		err, val := models.InsertClip(db, clientData, username)
 		if err != nil {
-			utils.ErrorReaderWriter(err, POSTClipData)
+			log.Println(err)
 			cont.JSON(http.StatusBadRequest, gin.H{"error": err})
 		} else {
-			cont.JSON(http.StatusOK, gin.H{"status": val})
+			cont.JSON(http.StatusOK, gin.H{"status": val,
+				"data": clientData})
 		}
 	}
 	models.CloseConnection(db)
@@ -122,12 +118,12 @@ func GETClipData(cont *gin.Context) {
 	uname := cont.Param("username")
 	if err, val := models.SelectByUsername(db, uname); val == -1 {
 		cont.JSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
-		utils.ErrorReaderWriter(err, GETClipData)
+		log.Println(err)
 	} else {
 		clipId := cont.Param("clip_id")
 		clipIdInt, _ := strconv.ParseInt(clipId, 10, 64)
 		err, count := models.ClipCount(db, val)
-		utils.ErrorReaderWriter(err, GETClipData)
+		log.Println(err)
 		if count >= clipIdInt {
 			err, data := models.SelectClip(db, clipIdInt, val)
 			if err != nil {
@@ -148,16 +144,16 @@ func GETAllClipData(cont *gin.Context) {
 	if err, val := models.SelectByUsername(db, uname); val == -1 {
 		cont.JSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		if err != nil {
-			utils.ErrorReaderWriter(err, GETAllClipData)
+			log.Println(err)
 		}
 	} else {
 		err, count := models.ClipCount(db, val)
 		if err != nil {
-			utils.ErrorReaderWriter(err, GETAllClipData)
+			log.Println(err)
 		}
 		for i := 0; int64(i) < count; i++ {
 			err, data := models.SelectClip(db, count-1, val)
-			utils.ErrorReaderWriter(err, GETAllClipData)
+			log.Println(err)
 			count--
 			dataSet = append(dataSet, data)
 		}
@@ -170,15 +166,15 @@ func DELETEAllClipData(cont *gin.Context) {
 	db := models.CreateConnection()
 	uname := cont.Param("username")
 	if err, val := models.SelectByUsername(db, uname); val == -1 {
-		cont.JSON(http.StatusUnauthorized, gin.H{"error": "user doesn't exists"})
-		utils.ErrorReaderWriter(err, DELETEAllClipData)
+		cont.JSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
+		log.Println(err)
 	} else {
 		var i int64
 		err, count := models.ClipCount(db, val)
-		utils.ErrorReaderWriter(err, DELETEAllClipData)
+		log.Println(err)
 		for i = 0; i <= count; i++ {
-			err := models.DeleteClip(db, int64(i), val)
-			utils.ErrorReaderWriter(err, DELETEAllClipData)
+			err := models.DeleteClip(db, i, val)
+			log.Println(err)
 		}
 		cont.JSON(http.StatusOK, gin.H{"status": true})
 	}

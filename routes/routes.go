@@ -20,6 +20,6 @@ var Routes = func() {
 	router.POST("v1/clip/:username", controller.POSTClipData)
 	router.GET("v1/clip/:username/:clip_id", controller.GETClipData)
 	router.GET("v1/clips/:username", controller.GETAllClipData)
-	router.DELETE("v1/clips/:username/:username", controller.DELETEAllClipData)
+	router.DELETE("v1/clips/:username", controller.DELETEAllClipData)
 	log.Fatalln(router.Run(":5675"))
 }

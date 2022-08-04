@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/JammUtkarsh/cshare-server/utils"
 	_ "github.com/lib/pq"
+	"log"
 	"os"
 	"strconv"
 )
@@ -29,10 +30,9 @@ type ClipStack struct {
 	// userID is the foreign key of the table.
 	UserID int64
 	// clipID is the is incremented by 1 every time a clip is added to the stack for each user.
-	ClipID   int64
-	Username string `json:"username" binding:"required"`
-	Message  string `json:"message" binding:"required"`
-	Secret   bool   `json:"secret" binding:"required"`
+	ClipID  int64
+	Message string `json:"message" binding:"required"`
+	Secret  bool   `json:"secret" binding:"required"`
 }
 
 func getDBConfig() *dbConfig {
@@ -61,7 +61,7 @@ func CreateConnection() *sql.DB {
 		configs.Host, configs.Port, configs.Username, configs.Password, configs.Name)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		utils.ErrorReaderWriter(err, CreateConnection)
+		log.Println(err)
 		panic(err)
 	}
 	return db
@@ -72,7 +72,7 @@ func CloseConnection(db *sql.DB) {
 	defer func() {
 		err := db.Close()
 		if err != nil {
-			utils.ErrorReaderWriter(err, CloseConnection)
+			log.Println(err)
 		}
 	}()
 }
