@@ -13,13 +13,21 @@ func SetUpRouter() *gin.Engine {
 
 var Routes = func() {
 	router := SetUpRouter()
-	router.POST("v1/auth/login", controller.POSTLogin)
-	router.POST("v1/auth/signup", controller.POSTSignUp)
-	router.PATCH("v1/users/:username/:updated", controller.UPDATEChangeUsername)
-	router.PATCH("v1/users/:username", controller.UPDATEChangePassword)
-	router.POST("v1/clip/:username", controller.POSTClipData)
-	router.GET("v1/clip/:username/:clip_id", controller.GETClipData)
-	router.GET("v1/clips/:username", controller.GETAllClipData)
-	router.DELETE("v1/clips/:username", controller.DELETEAllClipData)
+	basePath := router.Group("/v1")
+	RegisterUserRoutes(basePath)
 	log.Fatalln(router.Run(":5675"))
+}
+
+func RegisterUserRoutes(rg *gin.RouterGroup) {
+	authRoute := rg.Group("/auth")
+	authRoute.POST("/login", controller.POSTLogin)
+	authRoute.POST("/signup", controller.POSTCreateUser)
+	userRoute := rg.Group("/users")
+	userRoute.PATCH("/:username", controller.UPDATEChangePassword)
+	clipRoute := rg.Group("/clip")
+	clipRoute.POST("/:username", controller.POSTClipData)
+	clipRoute.GET("/:username/:clip_id", controller.GETClipData)
+	clipsRoute := rg.Group("/clips")
+	clipsRoute.GET("/:username", controller.GETAllClipData)
+	clipsRoute.DELETE("/:username", controller.DELETEAllClipData)
 }

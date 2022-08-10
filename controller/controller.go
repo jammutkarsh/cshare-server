@@ -44,9 +44,9 @@ func POSTLogin(cont *gin.Context) {
 	}
 }
 
-// POSTSignUp gets the user data from client and inserts it into the database for the first time.
+// POSTCreateUser gets the user data from client and inserts it into the database for the first time.
 // TODO: rewrite the function after creating authentication system.
-func POSTSignUp(cont *gin.Context) {
+func POSTCreateUser(cont *gin.Context) {
 	db := models.CreateConnection()
 	var clientCredentials models.Users
 	if err := cont.BindJSON(&clientCredentials); err != nil {
@@ -62,21 +62,6 @@ func POSTSignUp(cont *gin.Context) {
 		} else {
 			cont.JSON(http.StatusOK, gin.H{"status": val, "username": clientCredentials.Username})
 		}
-	}
-	models.CloseConnection(db)
-}
-
-func UPDATEChangeUsername(cont *gin.Context) {
-	db := models.CreateConnection()
-	initialName := cont.Param("username")
-	finalName := cont.Param("updated")
-	if err, val := models.SelectByUsername(db, finalName); val != -1 {
-		cont.JSON(http.StatusBadRequest, gin.H{"error": userNotFoundErrType})
-		log.Println(err)
-	} else {
-		err, _ := models.UpdateByUsername(db, initialName, finalName)
-		log.Println(err)
-		cont.JSON(http.StatusOK, gin.H{"status": val})
 	}
 	models.CloseConnection(db)
 }
