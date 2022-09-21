@@ -32,13 +32,13 @@ func ClipCount(db *sql.DB, userID int64) (err error, count int64) {
 }
 
 // InsertClip inserts a new clip into the database and returns the clip_id of the new clip.
-func InsertClip(db *sql.DB, c ClipStack, username string) (err error, clipID int64) {
-	err, c.UserID = GetUserID(db, username)
+func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
+	err, c.UserID = GetUserID(db, c.Username)
 	if err != nil {
 		return err, -1
 	}
-	err, c.ClipID = ClipCount(db, c.UserID)
-	err = db.QueryRow(insertClip, c.UserID, c.ClipID+1, c.Message, c.Secret).Scan(&clipID)
+	err, c.MessageID = ClipCount(db, c.UserID)
+	err = db.QueryRow(insertClip, c.UserID, c.MessageID+1, c.Message, c.Secret).Scan(&clipID)
 	if err != nil {
 		log.Fatalln("inside insertClip", err)
 		return err, -1
@@ -47,8 +47,8 @@ func InsertClip(db *sql.DB, c ClipStack, username string) (err error, clipID int
 }
 
 // SelectClip returns the clip with the given clip_id and user_id.
-func SelectClip(db *sql.DB, clipID, userID int64) (err error, c ClipStack) {
-	err = db.QueryRow(selectClip, clipID, userID).Scan(&c.ClipID, &c.Message, &c.Secret)
+func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
+	err = db.QueryRow(selectClip, clipID, userID).Scan(&c.MessageID, &c.Message, &c.Secret)
 	if err != nil {
 		// TODO: handle error when no clip or user is found.
 		return err, c

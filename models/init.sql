@@ -5,10 +5,10 @@ CREATE TABLE  users(
 CREATE TABLE  clip_stack
 (
     user_id INT NOT NULL ,
-    clip_id INT NOT NULL,
+    message_id INT NOT NULL,
     message TEXT NOT NULL,
     secret BOOLEAN,
-    PRIMARY KEY(user_id, clip_id),
+    PRIMARY KEY(user_id, message_id),
     CONSTRAINT user_id
         FOREIGN KEY(user_id)
             REFERENCES users(user_id)

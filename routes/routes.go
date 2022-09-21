@@ -12,6 +12,7 @@ func SetUpRouter() *gin.Engine {
 }
 
 var Routes = func() {
+	//TODO: Configure Middleware
 	router := SetUpRouter()
 	basePath := router.Group("/v1")
 	RegisterUserRoutes(basePath)

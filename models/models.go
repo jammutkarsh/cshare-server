@@ -17,22 +17,30 @@ type dbConfig struct {
 	Password string
 	Name     string
 }
+type Authentication struct {
+	AuthToken string `json:"authToken" binding:"required"`
+	TokenType string `json:"token_type" binding:"required"`
+	ExpiresIn int64  `json:"expiresIn" binding:"required"`
+}
 
 type Users struct {
 	// userID is the primary key of the table. It is autoincrement.
-	UserID   int64
+	UserID   int64  `json:"userID"`
 	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Password string `json:"password"  binding:"required"`
+	PCount   int    `json:"pCount"  binding:"required"`
+	SPCount  int    `json:"spCount"  binding:"required"`
 }
 
-type ClipStack struct {
+type Data struct {
 	// userID && clipID is the composite primary key of the table.
 	// userID is the foreign key of the table.
-	UserID int64
+	UserID   int64  `json:"userID"`
+	Username string `json:"username" binding:"required"`
 	// clipID is the is incremented by 1 every time a clip is added to the stack for each user.
-	ClipID  int64
-	Message string `json:"message" binding:"required"`
-	Secret  bool   `json:"secret" binding:"required"`
+	MessageID int64  `json:"clipID"`
+	Message   string `json:"message" binding:"required"`
+	Secret    bool   `json:"secret" binding:"required"`
 }
 
 func getDBConfig() *dbConfig {

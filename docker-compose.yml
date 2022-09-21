@@ -9,13 +9,26 @@ services:
     ports:
       - "5432:5432"
   backend:
-   container_name: "cshare-backend-server"
-   build:
-     context: .
-     target: backend-server
-   ports:
-     - "5675:5675"
+    container_name: "cshare-backend-server"
+    build:
+      context: .
+      target: backend-server
+    ports:
+      - "5675:5675"
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:5.5
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 volumes:
+  pgadmin-data:
   postgres_data:
     driver: local
 
