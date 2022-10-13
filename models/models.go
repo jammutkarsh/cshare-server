@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/JammUtkarsh/cshare-server/utils"
+	"github.com/golang-jwt/jwt"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -17,10 +18,15 @@ type dbConfig struct {
 	Password string
 	Name     string
 }
-type Authentication struct {
-	AuthToken string `json:"authToken" binding:"required"`
-	TokenType string `json:"token_type" binding:"required"`
-	ExpiresIn int64  `json:"expiresIn" binding:"required"`
+
+type header struct {
+	Alg string `json:"alg"`
+	Typ string `json:"typ"`
+}
+
+type JWTClaim struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
 }
 
 type Users struct {
@@ -75,7 +81,7 @@ func CreateConnection() *sql.DB {
 	return db
 }
 
-// CloseConnection closes the connection to the database. It takes a pointer to the database as argument.
+// CloseConnection closes the connection to the database. It is already deferred. It takes a pointer to the database as argument.
 func CloseConnection(db *sql.DB) {
 	defer func() {
 		err := db.Close()
