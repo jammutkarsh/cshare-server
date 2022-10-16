@@ -10,9 +10,9 @@ import (
 )
 
 func POSTClipData(ctx *gin.Context) {
-	var userData models.Data
 	db := models.CreateConnection()
 	models.CloseConnection(db)
+	var userData models.Data
 	if err := ctx.BindJSON(&userData); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
 		log.Println(err)
@@ -55,10 +55,7 @@ func GETAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	models.CloseConnection(db)
 	var dataSet []models.Data
-	err, val := models.SelectByUsername(db, ctx.Param("username"))
-	if err != nil {
-		log.Println(err)
-	}
+	_, val := models.SelectByUsername(db, ctx.Param("username"))
 	if val == -1 {
 		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
 		return
@@ -74,13 +71,11 @@ func GETAllClipData(ctx *gin.Context) {
 func DELETEAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	models.CloseConnection(db)
-	err, val := models.SelectByUsername(db, ctx.Param("username"))
+	_, val := models.SelectByUsername(db, ctx.Param("username"))
 	if val == -1 {
 		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
-		log.Println(err)
 	}
 	_, count := models.ClipCount(db, val)
-	log.Println(err)
 	for i := int64(0); i <= count; i++ {
 		err := models.DeleteClip(db, i, val)
 		if err != nil {

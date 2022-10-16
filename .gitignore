@@ -3,3 +3,4 @@
 cshare-server
 .DS_Store
 error.logs
+.env

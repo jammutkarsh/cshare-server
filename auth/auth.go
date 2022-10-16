@@ -3,24 +3,37 @@ package auth
 import (
 	"errors"
 	"github.com/JammUtkarsh/cshare-server/models"
+	"github.com/JammUtkarsh/cshare-server/utils"
+	"github.com/JammUtkarsh/cypherDecipher"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
+	"os"
 	"time"
 )
 
-var jwtKey = []byte("SecretYouShouldHide")
+func getJwtKey() []byte {
+	utils.LoadEnv(".env")
+	return []byte(os.Getenv("JWT_SECRET"))
+
+}
 
 func HashPassword(user models.Users) error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	db := models.CreateConnection()
+	models.CloseConnection(db)
+	originalPassword := cypherDecipher.DecipherPassword(user.Password, user.PCount, user.SPCount)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(originalPassword), 14)
 	if err != nil {
 		return err
 	}
 	password := string(bytes)
-	models.InsertPasswordHash(user.Username, password)
+	models.InsertPasswordHash(db, user.Username, password)
 	return nil
 }
-func CheckPassword(username, providedPassword string) error {
-	originalPassword := models.GetPasswordHash(username)
+func CheckPassword(user models.Users) error {
+	db := models.CreateConnection()
+	models.CloseConnection(db)
+	providedPassword := cypherDecipher.DecipherPassword(user.Password, user.PCount, user.SPCount)
+	originalPassword := models.GetPasswordHash(db, user.Username)
 	err := bcrypt.CompareHashAndPassword([]byte(originalPassword), []byte(providedPassword))
 	if err != nil {
 		return err
@@ -29,7 +42,7 @@ func CheckPassword(username, providedPassword string) error {
 }
 
 func GenerateJWT(username string) (tokenString string, err error) {
-	expirationTime := time.Now().Add(24 * 7 * 4 * time.Hour)
+	expirationTime := time.Now().Add(365 * time.Hour)
 	claims := &models.JWTClaim{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
@@ -37,7 +50,7 @@ func GenerateJWT(username string) (tokenString string, err error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString(jwtKey)
+	tokenString, err = token.SignedString(getJwtKey())
 	return
 }
 func ValidateToken(signedToken string) (err error) {
@@ -45,7 +58,7 @@ func ValidateToken(signedToken string) (err error) {
 		signedToken,
 		&models.JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtKey), nil
+			return getJwtKey(), nil
 		},
 	)
 	if err != nil {

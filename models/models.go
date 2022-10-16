@@ -66,8 +66,7 @@ func getDBConfig() *dbConfig {
 	}
 }
 
-// CreateConnection creates a connection to the database. It returns a pointer to the database.
-// Don't forget to close the connection when you are done using it. Using CloseConnection() function.
+// CreateConnection creates a connection to the database. Add CloseConnection() in the next line.
 func CreateConnection() *sql.DB {
 	configs := getDBConfig()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -81,7 +80,8 @@ func CreateConnection() *sql.DB {
 	return db
 }
 
-// CloseConnection closes the connection to the database. It is already deferred. It takes a pointer to the database as argument.
+// CloseConnection closes the connection to the database. It is already deferred. So that close connection pairs with create connection.
+// Leaving no room for closing the connection, later.
 func CloseConnection(db *sql.DB) {
 	defer func() {
 		err := db.Close()

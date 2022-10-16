@@ -2,8 +2,11 @@ package routes
 
 import (
 	"github.com/JammUtkarsh/cshare-server/controller"
+	"github.com/JammUtkarsh/cshare-server/middleware"
+	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/gin-gonic/gin"
 	"log"
+	"os"
 )
 
 func SetUpRouter() *gin.Engine {
@@ -12,23 +15,26 @@ func SetUpRouter() *gin.Engine {
 }
 
 var Routes = func() {
-	//TODO: Configure Middleware
 	router := SetUpRouter()
 	basePath := router.Group("/v1")
 	RegisterUserRoutes(basePath)
-	log.Fatalln(router.Run(":5675"))
+	utils.LoadEnv(".env")
+	log.Fatalln(router.Run(os.Getenv("SERVER_PORT")))
 }
 
 func RegisterUserRoutes(rg *gin.RouterGroup) {
-	authRoute := rg.Group("/auth")
-	authRoute.POST("/login", controller.POSTLogin)
-	authRoute.POST("/signup", controller.POSTCreateUser)
 	userRoute := rg.Group("/users")
+	userRoute.POST("/signup", controller.POSTCreateUser)
+	userRoute.POST("/login", controller.POSTLogin)
 	userRoute.PATCH("/:username", controller.UPDATEChangePassword)
+
 	clipRoute := rg.Group("/clip")
-	clipRoute.POST("/:username", controller.POSTClipData)
-	clipRoute.GET("/:username/:clip_id", controller.GETClipData)
-	clipsRoute := rg.Group("/clips")
-	clipsRoute.GET("/:username", controller.GETAllClipData)
-	clipsRoute.DELETE("/:username", controller.DELETEAllClipData)
+	secured := clipRoute.Group("/secured").Use(middleware.Auth())
+	{
+		secured.POST("/:username", controller.POSTClipData)
+		secured.GET("/:username/:clip_id", controller.GETClipData)
+		secured.GET("/:username", controller.GETAllClipData)
+		secured.DELETE("/:username", controller.DELETEAllClipData)
+	}
+
 }
