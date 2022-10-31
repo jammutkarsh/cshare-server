@@ -19,7 +19,7 @@ var Routes = func() {
 	basePath := router.Group("/v1")
 	RegisterUserRoutes(basePath)
 	utils.LoadEnv(".env")
-	log.Fatalln(router.Run(os.Getenv("SERVER_PORT")))
+	log.Fatalln(router.Run(":" + os.Getenv("SERVER_PORT")))
 }
 
 func RegisterUserRoutes(rg *gin.RouterGroup) {

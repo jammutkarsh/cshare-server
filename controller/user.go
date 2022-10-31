@@ -41,10 +41,9 @@ func POSTCreateUser(ctx *gin.Context) {
 func POSTLogin(ctx *gin.Context) {
 	db := models.CreateConnection()
 	models.CloseConnection(db)
-	var request tokenRequest
 	var user models.Users
-	if err := ctx.ShouldBindJSON(&request); err != nil {
-		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(err.Error()))
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
 		return
 	}
 	if credentialError := auth.CheckPassword(user); credentialError != nil {
@@ -63,7 +62,6 @@ func UPDATEChangePassword(ctx *gin.Context) {
 	db := models.CreateConnection()
 	models.CloseConnection(db)
 	var changeRequest ChangePassword
-	// TODO: Get username and password from JSON.
 	if err := ctx.BindJSON(&changeRequest); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
 		log.Println(err)
@@ -76,6 +74,8 @@ func UPDATEChangePassword(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
 		return
 	}
-	models.UpdatePassword(db, changeRequest.NewCred.Username, changeRequest.NewCred.Password)
+	if err, val := models.UpdatePassword(db, changeRequest.NewCred.Username, changeRequest.NewCred.Password); val == false || err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
+	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "password changed"})
 }

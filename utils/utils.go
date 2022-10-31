@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
@@ -24,14 +23,4 @@ func LoadEnv(filename string) {
 		log.Println(err)
 		log.Fatalf("error loading .env file: %s", err.Error())
 	}
-}
-
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }

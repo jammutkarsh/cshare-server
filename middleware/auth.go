@@ -1,27 +1,24 @@
 package middleware
 
 import (
+	"errors"
 	"github.com/JammUtkarsh/cshare-server/auth"
 	"github.com/gin-gonic/gin"
 )
 
+const authErrType = "authentication_error"
+
 func Auth() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		tokenString := context.GetHeader("Authorization")
-		if tokenString == "" {
-			context.JSON(401, gin.H{"error": "request does not contain an access token"})
-			context.Abort()
+		var tokenString string
+		if tokenString = context.GetHeader("Authorization"); tokenString == "" {
+			_ = context.AbortWithError(401, errors.New("request does not contain an access token"))
 			return
 		}
-		err := auth.ValidateToken(tokenString)
-		if err != nil {
-			context.JSON(401, gin.H{"error": err.Error()})
-			context.Abort()
+		if err := auth.ValidateToken(tokenString); err != nil {
+			_ = context.AbortWithError(401, errors.New(authErrType))
 			return
 		}
 		context.Next()
 	}
 }
-
-//copied code from https://github.com/iammukeshm/jwt-authentication-golang
-//understanding and modification needed

@@ -13,3 +13,13 @@ CREATE TABLE  clip_stack
         FOREIGN KEY(user_id)
             REFERENCES users(user_id)
 );
+
+CREATE TABLE  passwords
+(
+    user_id INT NOT NULL,
+    hash VARCHAR(150) NOT NULL,
+    PRIMARY KEY(user_id),
+    CONSTRAINT user_id
+        FOREIGN KEY(user_id)
+            REFERENCES users(user_id)
+);

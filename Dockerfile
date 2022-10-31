@@ -1,11 +1,11 @@
 # Postgres Database server setup
-FROM postgres:14-alpine AS backend-database
+FROM postgres:14-alpine AS database
 
-ENV POSTGRES_PASSWORD postingdata
+ENV POSTGRES_USER=cshare
 
-ENV POSTGRES_DB cshare
+ENV POSTGRES_PASSWORD=postingdata
 
-ENV POSTGRES_PORT 5432
+ENV POSTGRES_PORT=5432
 
 EXPOSE 5432
 # init.sql is used here because this container is also used for testing pusposes.
@@ -40,7 +40,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 
 # Start a new stage from scratch
-FROM alpine:latest AS backend-server
+FROM alpine:latest AS server
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/

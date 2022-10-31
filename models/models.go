@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/JammUtkarsh/cshare-server/utils"
-	"github.com/golang-jwt/jwt"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -19,16 +18,6 @@ type dbConfig struct {
 	Name     string
 }
 
-type header struct {
-	Alg string `json:"alg"`
-	Typ string `json:"typ"`
-}
-
-type JWTClaim struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
-
 type Users struct {
 	// userID is the primary key of the table. It is autoincrement.
 	UserID   int64  `json:"userID"`
@@ -39,11 +28,8 @@ type Users struct {
 }
 
 type Data struct {
-	// userID && clipID is the composite primary key of the table.
-	// userID is the foreign key of the table.
-	UserID   int64  `json:"userID"`
-	Username string `json:"username" binding:"required"`
-	// clipID is the is incremented by 1 every time a clip is added to the stack for each user.
+	UserID    int64  `json:"userID"`
+	Username  string `json:"username" binding:"required"`
 	MessageID int64  `json:"clipID"`
 	Message   string `json:"message" binding:"required"`
 	Secret    bool   `json:"secret" binding:"required"`
@@ -69,9 +55,8 @@ func getDBConfig() *dbConfig {
 // CreateConnection creates a connection to the database. Add CloseConnection() in the next line.
 func CreateConnection() *sql.DB {
 	configs := getDBConfig()
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		configs.Host, configs.Port, configs.Username, configs.Password, configs.Name)
+	psqlInfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
+		configs.Username, configs.Password, configs.Host, configs.Port, configs.Name)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(err)
