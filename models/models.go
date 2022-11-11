@@ -3,11 +3,12 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/JammUtkarsh/cshare-server/utils"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/JammUtkarsh/cshare-server/utils"
+	_ "github.com/lib/pq"
 )
 
 type dbConfig struct {
@@ -19,8 +20,6 @@ type dbConfig struct {
 }
 
 type Users struct {
-	// userID is the primary key of the table. It is autoincrement.
-	UserID   int64  `json:"userID"`
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password"  binding:"required"`
 	PCount   int    `json:"pCount"  binding:"required"`
@@ -29,10 +28,10 @@ type Users struct {
 
 type Data struct {
 	UserID    int64  `json:"userID"`
-	Username  string `json:"username" binding:"required"`
+	Username  string `json:"username"`
 	MessageID int64  `json:"clipID"`
 	Message   string `json:"message" binding:"required"`
-	Secret    bool   `json:"secret" binding:"required"`
+	Secret    *bool  `json:"secret" binding:"required"`
 }
 
 func getDBConfig() *dbConfig {
@@ -68,10 +67,8 @@ func CreateConnection() *sql.DB {
 // CloseConnection closes the connection to the database. It is already deferred. So that close connection pairs with create connection.
 // Leaving no room for closing the connection, later.
 func CloseConnection(db *sql.DB) {
-	defer func() {
-		err := db.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}()
+	err := db.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }

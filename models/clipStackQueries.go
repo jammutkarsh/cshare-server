@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	insertClip = `INSERT INTO clip_stack ( user_id, clip_id, message, secret)
-VALUES ($1, $2, $3, $4) RETURNING clip_id;`
-	selectClip = `SELECT clip_id, message, secret FROM clip_stack WHERE clip_id=$1 AND user_id=$2;`
-	deleteClip = `DELETE FROM clip_stack WHERE clip_id=$1 AND user_id=$2;`
+	insertClip = `INSERT INTO clip_stack ( user_id, message_id, message, secret)
+VALUES ($1, $2, $3, $4) RETURNING message_id;`
+	selectClip = `SELECT message_id, message, secret FROM clip_stack WHERE message_id=$1 AND user_id=$2;`
+	deleteClip = `DELETE FROM clip_stack WHERE message_id=$1 AND user_id=$2;`
 	countClips = `SELECT COUNT (user_id) FROM clip_stack WHERE user_id=$1 ;`
 )
 
@@ -31,7 +31,7 @@ func ClipCount(db *sql.DB, userID int64) (err error, count int64) {
 	return nil, count
 }
 
-// InsertClip inserts a new clip into the database and returns the clip_id of the new clip.
+// InsertClip inserts a new clip into the database and returns the message_id of the new clip.
 func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
 	err, c.UserID = GetUserID(db, c.Username)
 	if err != nil {
@@ -46,7 +46,7 @@ func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
 	return nil, clipID
 }
 
-// SelectClip returns the clip with the given clip_id and user_id.
+// SelectClip returns the clip with the given message_id and user_id.
 func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
 	err = db.QueryRow(selectClip, clipID, userID).Scan(&c.MessageID, &c.Message, &c.Secret)
 	if err != nil {
@@ -57,7 +57,7 @@ func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
 	return nil, c
 }
 
-// DeleteClip deletes the clip with the given clip_id and user_id.
+// DeleteClip deletes the clip with the given message_id and user_id.
 func DeleteClip(db *sql.DB, clipID, userID int64) (err error) {
 	_, err = db.Exec(deleteClip, clipID, userID)
 	// TODO: handle error when there is no clip to delete.

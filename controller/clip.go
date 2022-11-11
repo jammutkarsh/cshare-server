@@ -2,38 +2,39 @@ package controller
 
 import (
 	"errors"
-	"github.com/JammUtkarsh/cshare-server/models"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/JammUtkarsh/cshare-server/models"
+	"github.com/gin-gonic/gin"
 )
 
 func POSTClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	var userData models.Data
 	if err := ctx.BindJSON(&userData); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
-		log.Println(err)
 		return
 	}
 	clip := models.Data{
-		Username: userData.Username,
+		Username: ctx.Param("username"),
 		Message:  userData.Message,
 		Secret:   userData.Secret,
 	}
-	if err, _ := models.InsertClip(db, clip); err != nil {
+	err, messageID := models.InsertClip(db, clip)
+	if err != nil {
 		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(serviceErrType))
 		return
 	}
-	ctx.JSON(http.StatusCreated, &userData)
-
+	clip.MessageID = messageID
+	ctx.JSON(http.StatusCreated, clip)
 }
 
 func GETClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	err, val := models.SelectByUsername(db, ctx.Param("username"))
 	if err != nil {
 		log.Println(err)
@@ -53,7 +54,7 @@ func GETClipData(ctx *gin.Context) {
 
 func GETAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	var dataSet []models.Data
 	_, val := models.SelectByUsername(db, ctx.Param("username"))
 	if val == -1 {
@@ -70,7 +71,7 @@ func GETAllClipData(ctx *gin.Context) {
 
 func DELETEAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	_, val := models.SelectByUsername(db, ctx.Param("username"))
 	if val == -1 {
 		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))

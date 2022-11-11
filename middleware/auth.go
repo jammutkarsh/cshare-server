@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/JammUtkarsh/cshare-server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +17,7 @@ func Auth() gin.HandlerFunc {
 			_ = context.AbortWithError(401, errors.New("request does not contain an access token"))
 			return
 		}
+		tokenString = strings.Split(tokenString, "Bearer ")[1]
 		if err := auth.ValidateToken(tokenString); err != nil {
 			_ = context.AbortWithError(401, errors.New(authErrType))
 			return
