@@ -2,11 +2,12 @@ package controller
 
 import (
 	"errors"
+	"log"
+	"net/http"
+
 	"github.com/JammUtkarsh/cshare-server/auth"
 	"github.com/JammUtkarsh/cshare-server/models"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
 )
 
 type ChangePassword struct {
@@ -14,33 +15,28 @@ type ChangePassword struct {
 	NewCred models.Users `json:"newCred" binding:"required"`
 }
 
-type tokenRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
 func POSTCreateUser(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	var user models.Users
 	if err := ctx.BindJSON(&user); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
+		return
+	}
+	if err, _ := models.InsertUser(db, user.Username); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "username already exists"})
 		return
 	}
 	if err := auth.HashPassword(user); err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
 		return
 	}
-	if err, _ := models.InsertUser(db, user.Username); err != nil {
-		_ = ctx.AbortWithError(http.StatusConflict, errors.New("username already exists"))
-		return
-	}
-	ctx.JSON(http.StatusCreated, gin.H{"message": user.Username + " created"})
+	ctx.JSON(http.StatusCreated, gin.H{"status": user.Username + " created"})
 }
 
 func POSTLogin(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	var user models.Users
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
@@ -60,7 +56,7 @@ func POSTLogin(ctx *gin.Context) {
 
 func UPDATEChangePassword(ctx *gin.Context) {
 	db := models.CreateConnection()
-	models.CloseConnection(db)
+	defer models.CloseConnection(db)
 	var changeRequest ChangePassword
 	if err := ctx.BindJSON(&changeRequest); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))

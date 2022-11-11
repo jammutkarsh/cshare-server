@@ -1,12 +1,13 @@
 package routes
 
 import (
+	"log"
+	"os"
+
 	"github.com/JammUtkarsh/cshare-server/controller"
 	"github.com/JammUtkarsh/cshare-server/middleware"
 	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/gin-gonic/gin"
-	"log"
-	"os"
 )
 
 func SetUpRouter() *gin.Engine {
