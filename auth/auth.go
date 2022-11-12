@@ -25,18 +25,15 @@ func getJwtKey() []byte {
 
 // HashPassword hashes and stores the password into the database.
 // Internally it uses a special library github.com/JammUtkarsh/cypherDecipher, to remove salt from the input password.
-func HashPassword(user models.Users) error {
+func HashPassword(user models.Users) (password string, err error) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
 	originalPassword := cypherDecipher.DecipherPassword(user.Password, user.PCount, user.SPCount)
 	bytes, err := bcrypt.GenerateFromPassword([]byte(originalPassword), 14)
 	if err != nil {
-		return err
+		return "", nil
 	}
-	if err, _ = models.InsertPasswordHash(db, user.Username, string(bytes)); err != nil {
-		return err
-	}
-	return nil
+	return string(bytes), nil
 }
 
 // CheckPassword takes the user's credentials, removes the salt from the password and cross-checks for the password.
