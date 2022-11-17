@@ -13,43 +13,38 @@ import (
 func POSTClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var userData models.Data
+	var (
+		userData models.Data
+		err      error
+	)
+	userData.Username = ctx.Param("username")
 	if err := ctx.BindJSON(&userData); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
 		return
 	}
-	clip := models.Data{
-		Username: ctx.Param("username"),
-		Message:  userData.Message,
-		Secret:   userData.Secret,
-	}
-	err, messageID := models.InsertClip(db, clip)
-	if err != nil {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(serviceErrType))
+	if err, userData.MessageID = models.InsertClip(db, userData); err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(serviceErrType))
 		return
 	}
-	clip.MessageID = messageID
-	ctx.JSON(http.StatusCreated, clip)
+	ctx.JSON(http.StatusCreated, userData)
 }
 
 func GETClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	err, val := models.SelectByUsername(db, ctx.Param("username"))
-	if err != nil {
-		log.Println(err)
-	}
-	if val == -1 {
+	var val int64
+	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
 		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(userNotFoundErrType))
 		return
 	}
 	clipID, _ := strconv.ParseInt(ctx.Param("clip_id"), 10, 64)
 	_, count := models.ClipCount(db, val)
 	if count <= clipID {
-		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(resourceNotFoundErrType))
+		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(resourceNotFoundErrType))
+		return
 	}
 	_, data := models.SelectClip(db, clipID, val)
-	ctx.SecureJSON(http.StatusOK, data)
+	ctx.JSON(http.StatusOK, data)
 }
 
 func GETAllClipData(ctx *gin.Context) {
