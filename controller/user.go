@@ -2,7 +2,7 @@ package controller
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/JammUtkarsh/cshare-server/auth"
@@ -18,16 +18,26 @@ type ChangePassword struct {
 func POSTCreateUser(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var user models.Users
+	var (
+		user           models.Users
+		hashedPassword string
+		err            error
+	)
 	if err := ctx.BindJSON(&user); err != nil {
+		// TODO: present error in gin.H{"error": "message"}
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
 		return
 	}
 	if err, _ := models.InsertUser(db, user.Username); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "username already exists"})
+		fmt.Println(err)
 		return
 	}
-	if err := auth.HashPassword(user); err != nil {
+	if hashedPassword, err = auth.HashPassword(user); err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
+		return
+	}
+	if err, _ = models.InsertPasswordHash(db, user.Username, hashedPassword); err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
 		return
 	}
@@ -57,20 +67,23 @@ func POSTLogin(ctx *gin.Context) {
 func UPDATEChangePassword(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var changeRequest ChangePassword
+	var (
+		changeRequest  ChangePassword
+		hashedPassword string
+		err            error
+	)
 	if err := ctx.BindJSON(&changeRequest); err != nil {
 		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
-		log.Println(err)
 		return
 	}
 	if err := auth.CheckPassword(changeRequest.OldCred); err != nil {
 		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(credValidationErrType))
 	}
-	if err := auth.HashPassword(changeRequest.NewCred); err != nil {
+	if hashedPassword, err = auth.HashPassword(changeRequest.NewCred); err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
 		return
 	}
-	if err, val := models.UpdatePassword(db, changeRequest.NewCred.Username, changeRequest.NewCred.Password); val == false || err != nil {
+	if err, val := models.UpdatePassword(db, ctx.Param("username"), hashedPassword); val == false || err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(err.Error()))
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "password changed"})

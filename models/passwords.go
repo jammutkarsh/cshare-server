@@ -7,14 +7,14 @@ import (
 const (
 	insertHash = `INSERT INTO passwords ( user_id, hash ) VALUES ( $1, $2 );`
 	getHash    = `SELECT hash FROM passwords WHERE user_id=$1;`
-	updateHash = `UPDATE passwords SET hash=$1 WHERE user_id=$2;`
+	updateHash = `UPDATE passwords SET (hash) = ($1) WHERE user_id=$2`
 )
 
 func InsertPasswordHash(db *sql.DB, username, hashPassword string) (err error, val bool) {
-	err, userID := GetUserID(db, username);
+	err, userID := GetUserID(db, username)
 	if err != nil {
 		return err, false
-	} 
+	}
 	if _, err = db.Exec(insertHash, userID, hashPassword); err != nil {
 		return err, false
 	}
