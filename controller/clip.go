@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -18,12 +16,14 @@ func POSTClipData(ctx *gin.Context) {
 		err      error
 	)
 	userData.Username = ctx.Param("username")
+
 	if err := ctx.BindJSON(&userData); err != nil {
-		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
 		return
 	}
+
 	if err, userData.MessageID = models.InsertClip(db, userData); err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(serviceErrType))
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": serviceErrType})
 		return
 	}
 	ctx.JSON(http.StatusCreated, userData)
@@ -33,16 +33,18 @@ func GETClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
 	var val int64
+
 	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(userNotFoundErrType))
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		return
 	}
+
 	clipID, _ := strconv.ParseInt(ctx.Param("clip_id"), 10, 64)
-	_, count := models.ClipCount(db, val)
-	if count <= clipID {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(resourceNotFoundErrType))
+	if _, count := models.ClipCount(db, val); count <= clipID {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": resourceNotFoundErrType})
 		return
 	}
+
 	_, data := models.SelectClip(db, clipID, val)
 	ctx.JSON(http.StatusOK, data)
 }
@@ -50,10 +52,13 @@ func GETClipData(ctx *gin.Context) {
 func GETAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var dataSet []models.Data
-	_, val := models.SelectByUsername(db, ctx.Param("username"))
-	if val == -1 {
-		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
+	var (
+		val     int64
+		dataSet []models.Data
+	)
+
+	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		return
 	}
 	_, count := models.ClipCount(db, val)
@@ -67,16 +72,13 @@ func GETAllClipData(ctx *gin.Context) {
 func DELETEAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	_, val := models.SelectByUsername(db, ctx.Param("username"))
-	if val == -1 {
-		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
+	var val int64
+
+	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
+		return
 	}
-	_, count := models.ClipCount(db, val)
-	for i := int64(0); i <= count; i++ {
-		err := models.DeleteClip(db, i, val)
-		if err != nil {
-			log.Println(err)
-		}
-	}
+
+	_ = models.DeleteClips(db, val)
 	ctx.JSON(http.StatusOK, gin.H{"status": true})
 }

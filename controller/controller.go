@@ -6,4 +6,5 @@ const (
 	resourceNotFoundErrType = "resource_not_found_error"
 	userNotFoundErrType     = "user_not_found_error"
 	serviceErrType          = "service_error"
+	conflictErrType         = "username_already_exists"
 )
