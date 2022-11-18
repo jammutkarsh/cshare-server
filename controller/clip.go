@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -71,12 +70,9 @@ func DELETEAllClipData(ctx *gin.Context) {
 	if val == -1 {
 		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
 	}
-	_, count := models.ClipCount(db, val)
-	for i := int64(0); i <= count; i++ {
-		err := models.DeleteClip(db, i, val)
-		if err != nil {
-			log.Println(err)
-		}
+	if err := models.DeleteClips(db, val); err != nil {
+		return
 	}
+
 	ctx.JSON(http.StatusOK, gin.H{"status": true})
 }
