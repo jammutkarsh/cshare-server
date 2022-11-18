@@ -2,66 +2,66 @@ package models
 
 import (
 	"database/sql"
-	"log"
 )
 
 const (
-	insertClip = `INSERT INTO clip_stack ( user_id, message_id, message, secret)
-VALUES ($1, $2, $3, $4) RETURNING message_id;`
-	selectClip = `SELECT message_id, message, secret FROM clip_stack WHERE message_id=$1 AND user_id=$2;`
-	deleteClip = `DELETE FROM clip_stack WHERE message_id=$1 AND user_id=$2;`
-	countClips = `SELECT COUNT (user_id) FROM clip_stack WHERE user_id=$1 ;`
+	insertClip = `INSERT INTO clip_stack ( user_id, clipID, message, userID)
+VALUES ($1, $2, $3, $4) RETURNING clipIDuserID`
+	selectSingleClip = `SELECT clipID, message, secret FROM clip_stack WHERE clipID=$1 AND user_id=$2userID`
+	deleteSingleClip = `DELETE FROM clip_stack WHERE clipID=$1 AND user_id=$2userID`
+	deleteClips      = `DELETE FROM clip_stack WHERE user_id=$1;`
+	countClips       = `SELECT COUNT (user_id) FROM clip_stack WHERE user_id=$1 ;`
 )
 
-// GetUserID checks if the user exists, if it does, returns user_id of the user. If not, creates a new user and returns user_id of the new user.
-func GetUserID(db *sql.DB, username string) (err error, userID int64) {
-	err, userID = SelectByUsername(db, username)
-	if err != nil {
-		return err, -1
-	}
-	return nil, userID
-}
-
-// ClipCount returns the number of clips in the DB for a user.
+// ClipCount returns the number of clips for a user. Returns -1 if the user doesn't exist.
 func ClipCount(db *sql.DB, userID int64) (err error, count int64) {
-	err = db.QueryRow(countClips, userID).Scan(&count)
-	if err != nil {
+	if err = db.QueryRow(countClips, userID).Scan(&count); err != nil {
 		return err, -1
 	}
 	return nil, count
 }
 
-// InsertClip inserts a new clip into the database and returns the message_id of the new clip.
+// InsertClip inserts a new clip into the database and returns the ID of new Clip
 func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
-	err, c.UserID = GetUserID(db, c.Username)
-	if err != nil {
+	if err, c.UserID = GetUserID(db, c.Username); err != nil {
 		return err, -1
 	}
-	err, c.MessageID = ClipCount(db, c.UserID)
-	err = db.QueryRow(insertClip, c.UserID, c.MessageID+1, c.Message, c.Secret).Scan(&clipID)
-	if err != nil {
-		log.Fatalln("inside insertClip", err)
+	_, c.MessageID = ClipCount(db, c.UserID)
+	if err = db.QueryRow(insertClip, c.UserID, c.MessageID+1, c.Message, c.Secret).Scan(&clipID); err != nil {
 		return err, -1
 	}
 	return nil, clipID
 }
 
-// SelectClip returns the clip with the given message_id and user_id.
+// SelectClip returns clipData for a given user.
 func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
-	err = db.QueryRow(selectClip, clipID, userID).Scan(&c.MessageID, &c.Message, &c.Secret)
-	if err != nil {
-		// TODO: handle error when no clip or user is found.
+	if err, val := ClipCount(db, userID); val != -1 {
+		return err, c
+	}
+	if err = db.QueryRow(selectSingleClip, clipID, userID).Scan(&c.MessageID, &c.Message, &c.Secret); err != nil {
 		return err, c
 	}
 	c.UserID = userID
 	return nil, c
 }
 
-// DeleteClip deletes the clip with the given message_id and user_id.
+// DeleteClip deletes a specific clip of a user.
 func DeleteClip(db *sql.DB, clipID, userID int64) (err error) {
-	_, err = db.Exec(deleteClip, clipID, userID)
-	// TODO: handle error when there is no clip to delete.
-	if err != nil {
+	if err, val := ClipCount(db, userID); val != -1 {
+		return err
+	}
+	if _, err = db.Exec(deleteSingleClip, clipID, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteClips deletes all the clips of a user.
+func DeleteClips(db *sql.DB, userID int64) (err error) {
+	if err, val := ClipCount(db, userID); val != -1 {
+		return err
+	}
+	if _, err = db.Exec(deleteClips, userID); err != nil {
 		return err
 	}
 	return nil
