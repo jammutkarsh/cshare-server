@@ -8,8 +8,8 @@ ENV POSTGRES_PASSWORD=postingdata
 ENV POSTGRES_PORT=5432
 
 EXPOSE 5432
-# init.sql is used here because this container is also used for testing pusposes.
-# idely, this file should be removed when the container is used for production. It should be in the docker-compose.yml file.
+
+// setting up inital database tables.
 COPY models/init.sql /docker-entrypoint-initdb.d/
 
 # Start from golang base image
@@ -45,12 +45,11 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-# Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
+# Copy the Pre-built binary and .env file from the previous stage.
 COPY --from=builder /app/server .
 COPY --from=builder /app/.env .       
 
 # Expose port 5675 to the outside world
 EXPOSE 5675
 
-#Command to run the executable
 CMD ["./server"]

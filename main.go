@@ -14,6 +14,7 @@ func init() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	// sets router config to prod, test, debug, etc.
 	utils.LoadEnv(".env")
 	gin.SetMode(os.Getenv("GIN_MODE"))
 }

@@ -1,7 +1,13 @@
 package controller
 
+// clips.go consists of methods concerting clip endpoints;
+// They are secured by a JWT which are generated under user endpoints.
+// Every method follows a standard procedure of
+// 1. JSON validation.
+// 2. Database operations.
+// 3. Returning a response.
+
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// POSTClipData is POST HTTP method; submits a clip entry in the database for a given user with a valid JSON.
 func POSTClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
@@ -17,44 +24,54 @@ func POSTClipData(ctx *gin.Context) {
 		err      error
 	)
 	userData.Username = ctx.Param("username")
+
 	if err := ctx.BindJSON(&userData); err != nil {
-		_ = ctx.AbortWithError(http.StatusBadRequest, errors.New(formatValidationErrType))
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
 		return
 	}
+
 	if err, userData.MessageID = models.InsertClip(db, userData); err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, errors.New(serviceErrType))
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": serviceErrType})
 		return
 	}
 	ctx.JSON(http.StatusCreated, userData)
 }
 
+// GETClipData is a GET HTTP method; returns a `single clip` data for a given user and messageID.
 func GETClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
 	var val int64
+
 	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(userNotFoundErrType))
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		return
 	}
+
 	clipID, _ := strconv.ParseInt(ctx.Param("clip_id"), 10, 64)
-	_, count := models.ClipCount(db, val)
-	if count <= clipID {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New(resourceNotFoundErrType))
+	if _, count := models.ClipCount(db, val); count <= clipID {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": resourceNotFoundErrType})
 		return
 	}
+
 	_, data := models.SelectClip(db, clipID, val)
 	ctx.JSON(http.StatusOK, data)
 }
 
+// GETAllClipData is a GET HTTP method; returns `every clip` data for a given user.
 func GETAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var dataSet []models.Data
-	_, val := models.SelectByUsername(db, ctx.Param("username"))
-	if val == -1 {
-		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
+	var (
+		val     int64
+		dataSet []models.Data
+	)
+
+	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		return
 	}
+
 	_, count := models.ClipCount(db, val)
 	for i := int64(1); i <= count; i++ {
 		_, data := models.SelectClip(db, i, val)
@@ -63,16 +80,17 @@ func GETAllClipData(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dataSet)
 }
 
+// DELETEAllClipData is a DELETE HTTP method; performs deletes every clip entries for a given user.
 func DELETEAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
-	_, val := models.SelectByUsername(db, ctx.Param("username"))
-	if val == -1 {
-		_ = ctx.AbortWithError(http.StatusUnauthorized, errors.New(userNotFoundErrType))
-	}
-	if err := models.DeleteClips(db, val); err != nil {
+	var val int64
+
+	if _, val = models.SelectByUsername(db, ctx.Param("username")); val == -1 {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		return
 	}
 
+	_ = models.DeleteClips(db, val)
 	ctx.JSON(http.StatusOK, gin.H{"status": true})
 }
