@@ -1,5 +1,13 @@
 package controller
 
+// user.go consists of methods concerting user endpoints;
+// It provides a starting point for the clip endpoints.
+// Every method follows a standard procedure of
+// 1. JSON validation.
+// 2. Credential validation.
+// 3. Database operations.
+// 4. Returning a response.
+
 import (
 	"net/http"
 
@@ -8,11 +16,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ChangePassword struct {
+type changePassword struct {
 	OldCred models.Users `json:"oldCred" binding:"required"`
 	NewCred models.Users `json:"newCred" binding:"required"`
 }
 
+// POSTCreateUser is POST HTTP method; accepts a user entry in the database for a given valid JSON.
 func POSTCreateUser(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
@@ -45,6 +54,7 @@ func POSTCreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"status": user.Username + " created"})
 }
 
+// POSTLogin is POST HTTP method, validates credentials of an existing user and returns a JWT.
 func POSTLogin(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
@@ -72,11 +82,12 @@ func POSTLogin(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
+// UPDATEChangePassword  is UPDATE HTTP method, validates credentials of an existing user and updates the password of the user.
 func UPDATEChangePassword(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
 	var (
-		changeRequest  ChangePassword
+		changeRequest  changePassword
 		hashedPassword string
 		err            error
 	)

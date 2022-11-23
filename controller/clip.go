@@ -1,5 +1,12 @@
 package controller
 
+// clips.go consists of methods concerting clip endpoints;
+// They are secured by a JWT which are generated under user endpoints.
+// Every method follows a standard procedure of
+// 1. JSON validation.
+// 2. Database operations.
+// 3. Returning a response.
+
 import (
 	"net/http"
 	"strconv"
@@ -8,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// POSTClipData is POST HTTP method; submits a clip entry in the database for a given user with a valid JSON.
 func POSTClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
@@ -29,6 +37,7 @@ func POSTClipData(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, userData)
 }
 
+// GETClipData is a GET HTTP method; returns a `single clip` data for a given user and messageID.
 func GETClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
@@ -49,6 +58,7 @@ func GETClipData(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data)
 }
 
+// GETAllClipData is a GET HTTP method; returns `every clip` data for a given user.
 func GETAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
@@ -61,6 +71,7 @@ func GETAllClipData(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": userNotFoundErrType})
 		return
 	}
+
 	_, count := models.ClipCount(db, val)
 	for i := int64(1); i <= count; i++ {
 		_, data := models.SelectClip(db, i, val)
@@ -69,6 +80,7 @@ func GETAllClipData(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dataSet)
 }
 
+// DELETEAllClipData is a DELETE HTTP method; performs deletes every clip entries for a given user.
 func DELETEAllClipData(ctx *gin.Context) {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)

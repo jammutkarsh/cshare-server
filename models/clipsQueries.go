@@ -1,5 +1,8 @@
 package models
 
+// clipsQueries.go has methods which execute raw SQL statements in user table.
+// Postgres version of SQL is being used here
+
 import (
 	"database/sql"
 )

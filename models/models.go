@@ -1,5 +1,10 @@
 package models
 
+// models package deals with all the database related queries and functions.
+// models.go consists of
+// 1. Data structure concerned with db connection, user and clip data.
+// 2. Functions concerning database connection.
+
 import (
 	"database/sql"
 	"fmt"
@@ -34,24 +39,20 @@ type Data struct {
 	Secret    *bool  `json:"secret" binding:"required"`
 }
 
+// getDBConfig reads .env file for database authentication.
 func getDBConfig() *dbConfig {
-	utils.LoadEnv(`./.env`)
-	dbHost := os.Getenv("DB_HOST")
+	utils.LoadEnv(`.env`)
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
-	dbName := os.Getenv("DB_DATABASE")
-	dbUsername := os.Getenv("DB_USERNAME")
-	dbPassword := os.Getenv("DB_PASSWORD")
-
 	return &dbConfig{
-		Host:     dbHost,
 		Port:     dbPort,
-		Username: dbUsername,
-		Password: dbPassword,
-		Name:     dbName,
+		Host:     os.Getenv("DB_HOST"),
+		Username: os.Getenv("DB_DATABASE"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Name:     os.Getenv("DB_USERNAME"),
 	}
 }
 
-// CreateConnection creates a connection to the database. Add CloseConnection() in the next line.
+// CreateConnection creates a connection to the database. Add CloseConnection in the next line.
 func CreateConnection() *sql.DB {
 	configs := getDBConfig()
 	psqlInfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
@@ -64,8 +65,7 @@ func CreateConnection() *sql.DB {
 	return db
 }
 
-// CloseConnection closes the connection to the database. It is already deferred. So that close connection pairs with create connection.
-// Leaving no room for closing the connection, later.
+// CloseConnection closes the connection to the database. Use defer CloseConnection below CreateConnection.
 func CloseConnection(db *sql.DB) {
 	err := db.Close()
 	if err != nil {
