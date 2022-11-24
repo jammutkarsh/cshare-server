@@ -18,7 +18,7 @@ func InsertUser(db *sql.DB, username string) (err error, userID int64) {
 	return nil, userID
 }
 
-// SelectByUsername checks for the existence of a user. Returns -1 if the user doesn't exist.
+// SelectByUsername searches a user in DB by its username.
 func SelectByUsername(db *sql.DB, username string) (err error, userID int64) {
 	if err = db.QueryRow(selectByUsername, username).Scan(&userID); err != nil {
 		return err, -1
@@ -26,7 +26,7 @@ func SelectByUsername(db *sql.DB, username string) (err error, userID int64) {
 	return nil, userID
 }
 
-// GetUserID checks for the existence of a user. Returns -1 if the user doesn't exist.
+// GetUserID searches a user in DB by its userID. Uses username internally.
 func GetUserID(db *sql.DB, username string) (err error, userID int64) {
 	if err, userID = SelectByUsername(db, username); err != nil {
 		return err, -1

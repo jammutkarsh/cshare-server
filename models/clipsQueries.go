@@ -16,7 +16,7 @@ VALUES ($1, $2, $3, $4) RETURNING clipIDuserID`
 	countClips       = `SELECT COUNT (user_id) FROM clip_stack WHERE user_id=$1 ;`
 )
 
-// ClipCount returns the number of clips for a user. Returns -1 if the user doesn't exist.
+// ClipCount returns the number of clips for a user. Returns -1 if the user doesn't exist or has 0 clips.
 func ClipCount(db *sql.DB, userID int64) (err error, count int64) {
 	if err = db.QueryRow(countClips, userID).Scan(&count); err != nil {
 		return err, -1
@@ -24,7 +24,7 @@ func ClipCount(db *sql.DB, userID int64) (err error, count int64) {
 	return nil, count
 }
 
-// InsertClip inserts a new clip into the database and returns the ID of new Clip
+// InsertClip inserts a clip into the database and returns messageID.
 func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
 	if err, c.UserID = GetUserID(db, c.Username); err != nil {
 		return err, -1
@@ -36,7 +36,7 @@ func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
 	return nil, clipID
 }
 
-// SelectClip returns clipData for a given user.
+// SelectClip returns clip Data for a given user.
 func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
 	if err, val := ClipCount(db, userID); val != -1 {
 		return err, c

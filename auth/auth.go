@@ -1,7 +1,9 @@
 package auth
 
-// auth package deals with authentication and authorization related methods.
-// It has methods related JWT creation and validation & hashing and validation of hashed passwords.
+// auth package deals with authentication and authorization.
+// It has methods related to
+// 1. Hashing and verifying passwords
+// 2. JWT creation & validation
 
 import (
 	"errors"
@@ -19,44 +21,47 @@ type JWTClaim struct {
 	jwt.StandardClaims
 }
 
-// getJwtKey reads JWT_SECRET key from .env file and returns the secret
+// getJwtKey reads JWT_SECRET key from .env file and returns the secret in bytes.
 func getJwtKey() []byte {
 	utils.LoadEnv(".env")
 	return []byte(os.Getenv("JWT_SECRET"))
 
 }
 
-// HashPassword hashes and stores the password in the database.
+// HashPassword removes the salt from the provided password returns the hashed version of it.
 // Internally it uses a special library github.com/JammUtkarsh/cypherDecipher, to remove salt from the password.
 func HashPassword(user models.Users) (password string, err error) {
-	db := models.CreateConnection()
-	defer models.CloseConnection(db)
-
+	var bytes []byte
 	originalPassword := cypherDecipher.DecipherPassword(user.Password, user.PCount, user.SPCount)
-
-	bytes, err := bcrypt.GenerateFromPassword([]byte(originalPassword), 14)
+	bytes, err = bcrypt.GenerateFromPassword([]byte(originalPassword), 14)
 	if err != nil {
 		return "", nil
 	}
 	return string(bytes), nil
 }
 
-// CheckPassword takes the user's credentials, removes salt from the password and verifies for the password.
+// CheckPassword removes salt from the provided password and verifies its hash.
 // Internally it uses a special library github.com/JammUtkarsh/cypherDecipher, to remove salt from the password.
 func CheckPassword(user models.Users) error {
 	db := models.CreateConnection()
 	defer models.CloseConnection(db)
+	var (
+		err              error
+		originalPassword string
+	)
+
+	if err, originalPassword = models.GetPasswordHash(db, user.Username); err != nil {
+		return err
+	}
 
 	providedPassword := cypherDecipher.DecipherPassword(user.Password, user.PCount, user.SPCount)
-	_, originalPassword := models.GetPasswordHash(db, user.Username)
-
 	if err := bcrypt.CompareHashAndPassword([]byte(originalPassword), []byte(providedPassword)); err != nil {
 		return err
 	}
 	return nil
 }
 
-// GenerateJWT takes username as a parameter and returns JWT and an error if any.
+// GenerateJWT takes username as parameter and returns a JWT string and error if any.
 func GenerateJWT(username string) (tokenString string, err error) {
 	expirationTime := time.Now().Add(365 * time.Hour)
 
@@ -72,7 +77,7 @@ func GenerateJWT(username string) (tokenString string, err error) {
 	return
 }
 
-// ValidateToken takes JWT as a parameter and validates it. Returns error if any
+// ValidateToken takes JWT string as a parameter and verifies it. Returns an error if invalid.
 func ValidateToken(signedToken string) (err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
@@ -87,12 +92,12 @@ func ValidateToken(signedToken string) (err error) {
 
 	claims, ok := token.Claims.(*JWTClaim)
 	if !ok {
-		err = errors.New("couldn't parse claims")
+		err = errors.New("couldn't_parse_claims")
 		return
 	}
 
 	if claims.ExpiresAt < time.Now().Local().Unix() {
-		err = errors.New("token expired")
+		err = errors.New("token_expired")
 		return
 	}
 	return

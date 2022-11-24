@@ -1,6 +1,6 @@
 package controller
 
-// user.go consists of methods concerting user endpoints;
+// user.go consists of methods concerning user endpoints;
 // It provides a starting point for the clip endpoints.
 // Every method follows a standard procedure of
 // 1. JSON validation.
