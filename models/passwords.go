@@ -34,7 +34,7 @@ func GetPasswordHash(db *sql.DB, username string) (err error, hash string) {
 	return nil, hash
 }
 
-// UpdatePassword updates password of existing user; returns an error if unsuccessful.
+// UpdatePassword updates password of an existing user; returns an error if unsuccessful.
 func UpdatePassword(db *sql.DB, username, newPassword string) (err error) {
 	_, ID := GetUserID(db, username)
 	if _, err = db.Exec(updateHash, newPassword, ID); err != nil {

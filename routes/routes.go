@@ -2,7 +2,7 @@ package routes
 
 // routes package deals with router configuration.
 // Currently, it specifically targets gin-gonic router.
-// It has methods concerting ports, API version, endpoints, etc.
+// It has methods concerning ports, API version, endpoints, etc.
 
 import (
 	"log"
