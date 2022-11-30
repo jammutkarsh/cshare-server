@@ -1,3 +1,6 @@
+# Add Maintainer info
+# LABEL maintainer="Utkarsh Chourasia<utkarshchourasia.in>"
+
 # Postgres Database server setup
 FROM postgres:14-alpine AS database
 
@@ -9,16 +12,12 @@ ENV POSTGRES_PORT=5432
 
 EXPOSE 5432
 
-// setting up inital database tables.
 COPY models/init.sql /docker-entrypoint-initdb.d/
 
 # Start from golang base image
 FROM golang:alpine as builder
 
 ENV GO111MODULE=on
-
-# Add Maintainer info
-# LABEL maintainer="Utkarsh Chourasia<utkarshchourasia.in>"
 
 # Install git.
 # Git is required for fetching the dependencies.
