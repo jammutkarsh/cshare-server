@@ -16,11 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type changePassword struct {
-	OldCred models.Users `json:"oldCred" binding:"required"`
-	NewCred models.Users `json:"newCred" binding:"required"`
-}
-
 // POSTCreateUser is POST HTTP method; accepts a user entry in the database for a given valid JSON.
 func POSTCreateUser(ctx *gin.Context) {
 	db := models.CreateConnection()

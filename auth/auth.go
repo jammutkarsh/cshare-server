@@ -7,13 +7,14 @@ package auth
 
 import (
 	"errors"
+	"os"
+	"time"
+
 	"github.com/JammUtkarsh/cshare-server/models"
 	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/JammUtkarsh/cypherDecipher"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-	"os"
-	"time"
 )
 
 type JWTClaim struct {

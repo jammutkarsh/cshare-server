@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/JammUtkarsh/cshare-server/routes"
 	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/gin-gonic/gin"
-	"log"
-	"os"
 )
 
 func init() {

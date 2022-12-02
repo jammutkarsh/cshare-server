@@ -2,8 +2,9 @@ package utils
 
 // utils package has methods concerning common I/O operations to set up the environment.
 import (
-	"github.com/joho/godotenv"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 // LoadEnv loads the .env file and returns the error if any.
