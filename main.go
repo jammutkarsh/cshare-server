@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/JammUtkarsh/cshare-server/routes"
 	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/gin-gonic/gin"
-	"log"
-	"os"
 )
 
 func init() {
@@ -21,4 +22,5 @@ func init() {
 
 func main() {
 	routes.Routes()
+	fmt.Println("Server started at port"+os.Getenv("SERVER_PORT"))
 }
