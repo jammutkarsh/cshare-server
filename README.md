@@ -71,38 +71,33 @@ cp .env.local .env
 ### System Prerequisite
 
 - [Docker](https://www.docker.com/)
-- [Go](https://go.dev/) (optional)
+- [Go](https://go.dev/)
 - [PostgresSQL](https://www.postgresql.org/) (optional)
-
-> Docker alone is enough to *run*, *build*, and *serve* the entire application. Therefore, Go and PostgreSQL are optional in your system.
 
 **NOTE: The entire application was developed only using Go and Docker installed in the system. PostgreSQL databases were running in Docker containers.**
 
 ### Running Locally
 
-**A.** Building and running **containers** from source.
-
- ```bash
-sudo docker compose up --build
- ```
-
-**B.** Building source code and running databse container
+Building source code and running databse container
 
 ```bash
-# building and running go source code
-go run .
 
 # create docker volume
 docker volume create pgdata
 
 # running databse with preconfigured tables.
 docker pull jammutkarsh/cshare-db
+
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data jammutkarsh/cshare-db
+# or
 
 # building and running the container..
 docker build -t cshare-db --target=database .
+
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data cshare-db
 
+# building and running go source code
+go run .
 ```
 
 The server must be now be running at port `:5675`
