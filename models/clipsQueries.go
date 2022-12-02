@@ -38,9 +38,6 @@ func InsertClip(db *sql.DB, c Data) (err error, clipID int64) {
 
 // SelectClip returns clip Data for a given user.
 func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
-	if err, val := ClipCount(db, userID); val != -1 {
-		return err, c
-	}
 	if err = db.QueryRow(selectSingleClip, clipID, userID).Scan(&c.MessageID, &c.Message, &c.Secret); err != nil {
 		return err, c
 	}
@@ -48,11 +45,8 @@ func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
 	return nil, c
 }
 
-// DeleteClip deletes a specific clip of a user.
+
 func DeleteClip(db *sql.DB, clipID, userID int64) (err error) {
-	if err, val := ClipCount(db, userID); val != -1 {
-		return err
-	}
 	if _, err = db.Exec(deleteSingleClip, clipID, userID); err != nil {
 		return err
 	}
@@ -61,9 +55,6 @@ func DeleteClip(db *sql.DB, clipID, userID int64) (err error) {
 
 // DeleteClips deletes all the clips of a user.
 func DeleteClips(db *sql.DB, userID int64) (err error) {
-	if err, val := ClipCount(db, userID); val != -1 {
-		return err
-	}
 	if _, err = db.Exec(deleteClips, userID); err != nil {
 		return err
 	}
