@@ -8,9 +8,8 @@ import (
 )
 
 const (
-	insertHash = `INSERT INTO passwords ( user_id, hash ) VALUES ( $1, $2 );`
-	getHash    = `SELECT hash FROM passwords WHERE user_id=$1;`
-	updateHash = `UPDATE passwords SET (hash) = ($1) WHERE user_id=$2`
+	insertHash = `INSERT INTO passwords ( userID, hash ) VALUES ( $1, $2 );`
+	getHash    = `SELECT hash FROM passwords WHERE userID=$1;`
 )
 
 // InsertPasswordHash inserts the password hash in the database.
@@ -34,11 +33,3 @@ func GetPasswordHash(db *sql.DB, username string) (err error, hash string) {
 	return nil, hash
 }
 
-// UpdatePassword updates password of an existing user; returns an error if unsuccessful.
-func UpdatePassword(db *sql.DB, username, newPassword string) (err error) {
-	_, ID := GetUserID(db, username)
-	if _, err = db.Exec(updateHash, newPassword, ID); err != nil {
-		return err
-	}
-	return nil
-}

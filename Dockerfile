@@ -4,9 +4,7 @@
 # Postgres Database server setup
 FROM postgres:14-alpine AS database
 
-ENV POSTGRES_USER=cshare
-
-ENV POSTGRES_PASSWORD=postingdata
+ENV POSTGRES_PASSWORD=secret
 
 ENV POSTGRES_PORT=5432
 

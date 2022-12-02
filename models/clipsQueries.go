@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	insertClip = `INSERT INTO clip_stack ( user_id, clipID, message, userID)
-VALUES ($1, $2, $3, $4) RETURNING clipIDuserID`
-	selectSingleClip = `SELECT clipID, message, secret FROM clip_stack WHERE clipID=$1 AND user_id=$2userID`
-	deleteSingleClip = `DELETE FROM clip_stack WHERE clipID=$1 AND user_id=$2userID`
-	deleteClips      = `DELETE FROM clip_stack WHERE user_id=$1;`
-	countClips       = `SELECT COUNT (user_id) FROM clip_stack WHERE user_id=$1 ;`
+	insertClip = `INSERT INTO clip_stack ( userID, clipID, message, secret)
+VALUES ($1, $2, $3, $4) RETURNING clipID`
+	selectSingleClip = `SELECT clipID, message, secret FROM clip_stack WHERE clipID=$1 AND userID=$2`
+	deleteSingleClip = `DELETE FROM clip_stack WHERE clipID=$1 AND userID=$2`
+	deleteClips      = `DELETE FROM clip_stack WHERE userID=$1;`
+	countClips       = `SELECT COUNT (userID) FROM clip_stack WHERE userID=$1 ;`
 )
 
 // ClipCount returns the number of clips for a user. Returns -1 if the user doesn't exist or has 0 clips.
