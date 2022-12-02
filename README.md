@@ -62,7 +62,7 @@ git clone https://github.com/JammUtkarsh/cshare-server
 cd cshare-server
 ```
 
-3. Generate the .env file. It contains preferences depending upon **development/debug** or **deployment/production**. `.env.local` has defualt preferences for production.
+3. Generate the .env file. It contains preferences depending upon **development/debug** or **deployment/production**. `.env.local` has default preferences for production.
 
 ```bash
 cp .env.local .env 
@@ -72,20 +72,21 @@ cp .env.local .env
 
 - [Docker](https://www.docker.com/)
 - [Go](https://go.dev/)
+- [Postman](https://www.postman.com/)
 - [PostgresSQL](https://www.postgresql.org/) (optional)
 
 **NOTE: The entire application was developed only using Go and Docker installed in the system. PostgreSQL databases were running in Docker containers.**
 
 ### Running Locally
 
-Building source code and running databse container
+Building source code and running database container
 
 ```bash
 
 # create docker volume
 docker volume create pgdata
 
-# running databse with preconfigured tables.
+# running database with preconfigured tables.
 docker pull jammutkarsh/cshare-db
 
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data jammutkarsh/cshare-db
@@ -105,6 +106,8 @@ The server must be now be running at port `:5675`
 ## API Document
 
 See [Postman API Documentation](https://documenter.getpostman.com/view/19332599/2s8YszQqbU)
+
+Use `Run In Postman` on top right corner for best experience.
 
 ## Contribution
 
