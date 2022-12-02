@@ -81,36 +81,3 @@ func POSTLogin(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
-
-// UPDATEChangePassword  is UPDATE HTTP method, validates credentials of an existing user and updates the password of the user.
-func UPDATEChangePassword(ctx *gin.Context) {
-	db := models.CreateConnection()
-	defer models.CloseConnection(db)
-	var (
-		changeRequest  changePassword
-		hashedPassword string
-		err            error
-	)
-
-	if err = ctx.BindJSON(&changeRequest); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
-		return
-	}
-
-	if err = auth.CheckPassword(changeRequest.OldCred); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": credValidationErrType})
-		return
-	}
-
-	if hashedPassword, err = auth.HashPassword(changeRequest.NewCred); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": serviceErrType})
-		return
-	}
-
-	if err = models.UpdatePassword(db, ctx.Param("username"), hashedPassword); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": serviceErrType})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"message": "password changed"})
-}

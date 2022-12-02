@@ -34,7 +34,6 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 	userRoute := rg.Group("/users")
 	userRoute.POST("/signup", controller.POSTCreateUser)
 	userRoute.POST("/login", controller.POSTLogin)
-	userRoute.PATCH("/:username", controller.UPDATEChangePassword)
 
 	clipRoute := rg.Group("/clip")
 	// securing user routes using a Auth() function in middleware.

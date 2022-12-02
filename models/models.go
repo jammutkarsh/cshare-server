@@ -46,17 +46,18 @@ func getDBConfig() *dbConfig {
 	return &dbConfig{
 		Port:     dbPort,
 		Host:     os.Getenv("DB_HOST"),
-		Username: os.Getenv("DB_DATABASE"),
+		Username: os.Getenv("DB_USERNAME"),
 		Password: os.Getenv("DB_PASSWORD"),
-		Name:     os.Getenv("DB_USERNAME"),
+		Name:     os.Getenv("DB_DATABASE"),
 	}
 }
 
 // CreateConnection creates a connection to the database. Add CloseConnection in the next line.
 func CreateConnection() *sql.DB {
 	configs := getDBConfig()
-	psqlInfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable",
-		configs.Username, configs.Password, configs.Host, configs.Port, configs.Name)
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		configs.Host, configs.Port, configs.Username, configs.Password, configs.Name)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(err)

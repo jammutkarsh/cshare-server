@@ -6,8 +6,8 @@ package models
 import "database/sql"
 
 const (
-	insertUser       = `INSERT INTO users(username) VALUES ($1) RETURNING user_id;`
-	selectByUsername = `SELECT user_id FROM users WHERE username=$1;`
+	insertUser       = `INSERT INTO users(username) VALUES ($1) RETURNING userID;`
+	selectByUsername = `SELECT userID FROM users WHERE username=$1;`
 )
 
 // InsertUser inserts a new user into the database and returns a userID. userID is -1 if it already exists.
