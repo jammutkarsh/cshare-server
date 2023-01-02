@@ -22,4 +22,5 @@ func init() {
 
 func main() {
 	routes.Routes()
+	fmt.Println("Server started at port"+os.Getenv("SERVER_PORT"))
 }

@@ -62,7 +62,7 @@ git clone https://github.com/JammUtkarsh/cshare-server
 cd cshare-server
 ```
 
-3. Generate the .env file. It contains preferences depending upon **development/debug** or **deployment/production**. `.env.local` has defualt preferences for production.
+3. Generate the .env file. It contains preferences depending upon **development/debug** or **deployment/production**. `.env.local` has default preferences for production.
 
 ```bash
 cp .env.local .env 
@@ -71,10 +71,9 @@ cp .env.local .env
 ### System Prerequisite
 
 - [Docker](https://www.docker.com/)
-- [Go](https://go.dev/) (optional)
+- [Go](https://go.dev/)
+- [Postman](https://www.postman.com/)
 - [PostgresSQL](https://www.postgresql.org/) (optional)
-
-> Docker alone is enough to *run*, *build*, and *serve* the entire application. Therefore, Go and PostgreSQL are optional in your system.
 
 **NOTE: The entire application was developed only using Go and Docker installed in the system. PostgreSQL databases were running in Docker containers.**
 
@@ -94,12 +93,15 @@ sudo docker compose up --build
 # running databse with preconfigured tables.
 docker volume create pgdata
 docker pull jammutkarsh/cshare-db
+
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data jammutkarsh/cshare-db
+# or
 
 # OR
 
 # building and running the container..
 docker build -t cshare-db --target=database .
+
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data cshare-db
 ```
 
@@ -108,6 +110,8 @@ docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data cshare-db
 ## API Document
 
 See [Postman API Documentation](https://documenter.getpostman.com/view/19332599/2s8YszQqbU)
+
+Use `Run In Postman` on top right corner for best experience.
 
 ## Contribution
 
