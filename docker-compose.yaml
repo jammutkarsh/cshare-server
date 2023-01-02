@@ -1,0 +1,30 @@
+version: '3'
+services:
+  postgres-db:
+    build:
+      context: ./
+      target: database
+    container_name: full_db_postgres
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - DATABASE_HOST=${DB_HOST}
+    ports:
+      - '5432:5432'
+    volumes:
+      - database_postgres:/var/lib/postgresql/data
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin_container
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   depends_on:
+  #     - postgres-db
+  #   ports:
+  #     - "5050:80"
+  #   networks:
+  #     - fullstack
+  #   restart: unless-stopped
+
+volumes:
+  database_postgres:
