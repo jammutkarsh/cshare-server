@@ -79,29 +79,33 @@ cp .env.local .env
 
 ### Running Locally
 
-Building source code and running database container
+Building and running database container.
+
+**A.** Using `docker-compose`
+
+ ```bash
+sudo docker compose up --build
+ ```
+
+**B.** Using pre-built image
 
 ```bash
-
-# create docker volume
+# running databse with preconfigured tables.
 docker volume create pgdata
-
-# running database with preconfigured tables.
 docker pull jammutkarsh/cshare-db
 
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data jammutkarsh/cshare-db
 # or
 
+# OR
+
 # building and running the container..
 docker build -t cshare-db --target=database .
 
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data cshare-db
-
-# building and running go source code
-go run .
 ```
 
-The server must be now be running at port `:5675`
+ building and running go source code using `go run .` The server must be now be running at port `:5675`
 
 ## API Document
 
