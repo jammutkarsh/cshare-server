@@ -5,10 +5,14 @@
 - [Table Of Content](#table-of-content)
 - [Overview](#overview)
 - [Status](#status)
+- [Digrams](#digrams)
+  - [Database ER Digram](#database-er-digram)
 - [Usage](#usage)
   - [Starting the Server](#starting-the-server)
   - [System Prerequisite](#system-prerequisite)
   - [Running Locally](#running-locally)
+    - [Running database container](#running-database-container)
+    - [Running Go Code](#running-go-code)
 - [API Document](#api-document)
 - [Contribution](#contribution)
 - [Acknowledgement](#acknowledgement)
@@ -40,9 +44,15 @@ Framework used
 
 ## Status
 
-> The backend (this project) is at stable version v1.0.0. It provides API endpoints for daily use.
+> The backend (this project) is at stable version v1. It provides basic API endpoints for daily use.
 > The official frontend command-line application is currently in development.
-> You can also build your custom frontend(GUI, CLI or TUI) on top of this backend.
+> You can also build your custom frontend(GUI, CLI or TUI) on top of this backend by following the docuementations.
+
+## Digrams
+
+### Database ER Digram
+
+Refer ER digrams [here](doc/schema/README.md)
 
 ## Usage
 
@@ -79,7 +89,7 @@ cp .env.local .env
 
 ### Running Locally
 
-Building and running database container.
+#### Running database container
 
 **A.** Using `docker-compose`
 
@@ -105,17 +115,23 @@ docker build -t cshare-db --target=database .
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data cshare-db
 ```
 
- building and running go source code using `go run .` The server must be now be running at port `:5675`
+#### Running Go Code
+
+```bash
+go run .
+```
+
+The server will be now be accessable on port `:5675` or as per the `.env` file
 
 ## API Document
 
 See [Postman API Documentation](https://documenter.getpostman.com/view/19332599/2s8YszQqbU)
 
-Use `Run In Postman` on top right corner for best experience.
+Use `Run In Postman` on *top right corner* for best experience.
 
 ## Contribution
 
-This project is for learning and portfolio purposes. You can open issues if you find any.
+This project is for learning purposes. Although you still can open issues if you find any.
 If possible, mention minimum amount of steps to reproduce the issue in the [issue tab](https://github.com/JammUtkarsh/cshare-server/issues)
 
 ## Acknowledgement

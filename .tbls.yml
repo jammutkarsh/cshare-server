@@ -1,0 +1,16 @@
+# DSN (Database Source Name) to connect database
+dsn: postgres://postgres:secret@localhost:5432/postgres?sslmode=disable
+
+# Path to generate document
+# Default is `dbdoc`
+docPath: doc/schema
+lint:
+  requireColumnComment:
+    enabled: true
+    exclude:
+      - id
+      - created
+      - updated
+  columnCount:
+    enabled: true
+    max: 10
