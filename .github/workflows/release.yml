@@ -1,3 +1,5 @@
+name: go-binary-release
+
 on:
   push:
     # run only against tags

@@ -1,4 +1,4 @@
-name: CI for Docker Hub
+name: continaer-release
 
 on: [push]
 
