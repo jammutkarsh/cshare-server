@@ -13,7 +13,7 @@ import (
 func init() {
 	// sets router config to prod, test, debug, etc.
 	if err := utils.LoadEnv(".env"); err != nil {
-		log.Fatalf("get sample env file from https://github.com/JammUtkarsh/cshare-server/blob/main/.env.local")
+		log.Fatalf("missing .env file; get sample from 'https://github.com/JammUtkarsh/cshare-server/blob/main/.env.local'")
 	}
 	gin.SetMode(os.Getenv("GIN_MODE"))
 }

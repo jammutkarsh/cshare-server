@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: linux
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: linux
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: linux
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: linux
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: darwin
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: windows
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1.34
+      - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: windows
