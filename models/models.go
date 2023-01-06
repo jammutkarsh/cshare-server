@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 
+	// Importing postgres driver
 	_ "github.com/lib/pq"
 )
 
@@ -23,6 +24,9 @@ type dbConfig struct {
 	Name     string
 }
 
+// Users is the data structure for user data. This is used for authentication.
+// It has addational fields such as PasswordCount- Pcount & SaltedPasswordCount- SPcount.
+// These are used to check if the password has been changed or not
 type Users struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password"  binding:"required"`
@@ -30,6 +34,7 @@ type Users struct {
 	SPCount  int    `json:"spCount"  binding:"required"`
 }
 
+// Data is the data structure for clip data. This is used for storing and retrieving clips.
 type Data struct {
 	UserID    int64  `json:"userID"`
 	Username  string `json:"username"`

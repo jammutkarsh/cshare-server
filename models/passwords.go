@@ -15,7 +15,7 @@ const (
 // InsertPasswordHash inserts the password hash in the database.
 func InsertPasswordHash(db *sql.DB, username, hashPassword string) (err error) {
 	var userID int64
-	if err, userID = GetUserID(db, username); err != nil {
+	if userID, err = GetUserID(db, username); err != nil {
 		return err
 	}
 	if _, err = db.Exec(insertHash, userID, hashPassword); err != nil {
@@ -25,10 +25,10 @@ func InsertPasswordHash(db *sql.DB, username, hashPassword string) (err error) {
 }
 
 // GetPasswordHash fetches the hash from the database.
-func GetPasswordHash(db *sql.DB, username string) (err error, hash string) {
+func GetPasswordHash(db *sql.DB, username string) (hash string, err error) {
 	_, ID := GetUserID(db, username)
 	if err = db.QueryRow(getHash, ID).Scan(&hash); err != nil {
-		return err, hash
+		return hash, err
 	}
-	return nil, hash
+	return hash, nil
 }

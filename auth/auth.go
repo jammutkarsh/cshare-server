@@ -16,7 +16,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type JWTClaim struct {
+type jwtClaim struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
@@ -50,7 +50,7 @@ func CheckPassword(user models.Users) error {
 
 	var originalPassword string
 
-	if err, originalPassword = models.GetPasswordHash(db, user.Username); err != nil {
+	if originalPassword, err = models.GetPasswordHash(db, user.Username); err != nil {
 		return err
 	}
 
@@ -65,7 +65,7 @@ func CheckPassword(user models.Users) error {
 func GenerateJWT(username string) (tokenString string, err error) {
 	expirationTime := time.Now().Add(365 * time.Hour)
 
-	claims := &JWTClaim{
+	claims := &jwtClaim{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -81,7 +81,7 @@ func GenerateJWT(username string) (tokenString string, err error) {
 func ValidateToken(signedToken string) (err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
-		&JWTClaim{},
+		&jwtClaim{},
 		func(token *jwt.Token) (interface{}, error) {
 			return getJwtKey(), nil
 		},
@@ -90,7 +90,7 @@ func ValidateToken(signedToken string) (err error) {
 		return
 	}
 
-	claims, ok := token.Claims.(*JWTClaim)
+	claims, ok := token.Claims.(*jwtClaim)
 	if !ok {
 		err = errors.New("couldn't_parse_claims")
 		return

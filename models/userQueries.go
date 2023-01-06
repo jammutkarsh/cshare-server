@@ -11,25 +11,25 @@ const (
 )
 
 // InsertUser inserts a new user into the database and returns a userID. userID is -1 if it already exists.
-func InsertUser(db *sql.DB, username string) (err error, userID int64) {
+func InsertUser(db *sql.DB, username string) (userID int64, err error) {
 	if err = db.QueryRow(insertUser, username).Scan(&userID); err != nil {
-		return err, -1
+		return -1, err
 	}
-	return nil, userID
+	return userID, nil
 }
 
 // SelectByUsername searches a user in DB by its username.
-func SelectByUsername(db *sql.DB, username string) (err error, userID int64) {
+func SelectByUsername(db *sql.DB, username string) (userID int64, err error) {
 	if err = db.QueryRow(selectByUsername, username).Scan(&userID); err != nil {
-		return err, -1
+		return -1, err
 	}
-	return nil, userID
+	return userID, nil
 }
 
 // GetUserID searches a user in DB by its userID. Uses username internally.
-func GetUserID(db *sql.DB, username string) (err error, userID int64) {
-	if err, userID = SelectByUsername(db, username); err != nil {
-		return err, -1
+func GetUserID(db *sql.DB, username string) (userID int64, err error) {
+	if userID, err = SelectByUsername(db, username); err != nil {
+		return -1, err
 	}
-	return nil, userID
+	return userID, nil
 }

@@ -21,7 +21,7 @@ func POSTCreateUser(ctx *gin.Context) {
 	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
 		return
 	}
 
@@ -35,7 +35,7 @@ func POSTCreateUser(ctx *gin.Context) {
 		return
 	}
 
-	if err, _ = models.InsertUser(db, user.Username); err != nil {
+	if _, err = models.InsertUser(db, user.Username); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": conflictErrType})
 		return
 	}
@@ -58,7 +58,7 @@ func POSTLogin(ctx *gin.Context) {
 	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
 		return
 	}
 

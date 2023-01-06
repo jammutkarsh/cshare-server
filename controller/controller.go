@@ -10,5 +10,5 @@ const (
 	userNotFoundErrType     = "user_not_found_error"
 	serviceErrType          = "service_error"
 	conflictErrType         = "username_already_exists"
-	DatabaseErrType         = "database_connection_error"
+	databaseErrType         = "database_connection_error"
 )
