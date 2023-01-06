@@ -1,0 +1,21 @@
+name: CI for Docker Hub
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-login
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASS }}
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: docker-build-cshare-db
+        run: |
+          docker build . -t jammutkarsh/cshare-db
+      - name: docker push
+        run: |
+          docker push jammutkarsh/cshare-db
