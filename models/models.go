@@ -12,7 +12,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/JammUtkarsh/cshare-server/utils"
 	_ "github.com/lib/pq"
 )
 
@@ -41,7 +40,6 @@ type Data struct {
 
 // getDBConfig reads .env file for database authentication.
 func getDBConfig() *dbConfig {
-	utils.LoadEnv(`.env`)
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
 	return &dbConfig{
 		Port:     dbPort,
@@ -53,17 +51,17 @@ func getDBConfig() *dbConfig {
 }
 
 // CreateConnection creates a connection to the database. Add CloseConnection in the next line.
-func CreateConnection() *sql.DB {
+func CreateConnection() (db *sql.DB, err error) {
 	configs := getDBConfig()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		configs.Host, configs.Port, configs.Username, configs.Password, configs.Name)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(err)
-		panic(err)
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
 // CloseConnection closes the connection to the database. Use defer CloseConnection below CreateConnection.

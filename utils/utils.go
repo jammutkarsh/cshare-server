@@ -8,9 +8,11 @@ import (
 )
 
 // LoadEnv loads the .env file and returns the error if any.
-func LoadEnv(filename string) {
+func LoadEnv(filename string) error {
 	err := godotenv.Load(filename)
 	if err != nil {
-		log.Fatalf("error loading .env file: %s", err.Error())
+		log.Printf("error loading .env file: %s", err.Error())
+		return err
 	}
+	return nil
 }

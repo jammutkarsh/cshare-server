@@ -45,7 +45,6 @@ func SelectClip(db *sql.DB, clipID, userID int64) (err error, c Data) {
 	return nil, c
 }
 
-
 func DeleteClip(db *sql.DB, clipID, userID int64) (err error) {
 	if _, err = db.Exec(deleteSingleClip, clipID, userID); err != nil {
 		return err

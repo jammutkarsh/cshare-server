@@ -11,16 +11,14 @@ import (
 )
 
 func init() {
-	err := log.Output(1, "error.logs")
-	if err != nil {
-		fmt.Println(err)
-	}
 	// sets router config to prod, test, debug, etc.
-	utils.LoadEnv(".env")
+	if err := utils.LoadEnv(".env"); err != nil {
+		log.Fatalf("get sample env file from https://github.com/JammUtkarsh/cshare-server/blob/main/.env.local")
+	}
 	gin.SetMode(os.Getenv("GIN_MODE"))
 }
 
 func main() {
 	routes.Routes()
-	fmt.Println("Server started at port"+os.Getenv("SERVER_PORT"))
+	fmt.Println("Server started at port" + os.Getenv("SERVER_PORT"))
 }

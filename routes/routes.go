@@ -10,7 +10,6 @@ import (
 
 	"github.com/JammUtkarsh/cshare-server/controller"
 	"github.com/JammUtkarsh/cshare-server/middleware"
-	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +24,6 @@ var Routes = func() {
 	router := SetUpRouter()
 	basePath := router.Group("/v1")
 	RegisterUserRoutes(basePath)
-	utils.LoadEnv(".env")
 	log.Fatalln(router.Run(":" + os.Getenv("SERVER_PORT")))
 }
 

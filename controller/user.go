@@ -18,12 +18,16 @@ import (
 
 // POSTCreateUser is POST HTTP method; accepts a user entry in the database for a given valid JSON.
 func POSTCreateUser(ctx *gin.Context) {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		return
+	}
+
 	var (
 		user           models.Users
 		hashedPassword string
-		err            error
 	)
 
 	if err = ctx.BindJSON(&user); err != nil {
@@ -51,12 +55,16 @@ func POSTCreateUser(ctx *gin.Context) {
 
 // POSTLogin is POST HTTP method, validates credentials of an existing user and returns a JWT.
 func POSTLogin(ctx *gin.Context) {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		return
+	}
+
 	var (
 		user        models.Users
 		tokenString string
-		err         error
 	)
 
 	if err = ctx.ShouldBindJSON(&user); err != nil {

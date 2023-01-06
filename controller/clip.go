@@ -18,12 +18,13 @@ import (
 // POSTClipData is POST HTTP method; For a given user with a valid clips JSON and stores it in DB.
 // returns appropriate response with status code.
 func POSTClipData(ctx *gin.Context) {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var (
-		userData models.Data
-		err      error
-	)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		return
+	}
+	var userData models.Data
 	userData.Username = ctx.Param("username")
 
 	if err := ctx.BindJSON(&userData); err != nil {
@@ -40,8 +41,13 @@ func POSTClipData(ctx *gin.Context) {
 
 // GETClipData is a GET HTTP method; returns a `single clip` JSON data for a given user and messageID.
 func GETClipData(ctx *gin.Context) {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		return
+	}
+
 	var val int64
 
 	if _, val = models.GetUserID(db, ctx.Param("username")); val == -1 {
@@ -61,8 +67,13 @@ func GETClipData(ctx *gin.Context) {
 
 // GETAllClipData is a GET HTTP method; returns `all clips` JSON data for a given user.
 func GETAllClipData(ctx *gin.Context) {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		return
+	}
+
 	var (
 		val     int64
 		dataSet []models.Data
@@ -83,8 +94,13 @@ func GETAllClipData(ctx *gin.Context) {
 
 // DELETEAllClipData is a DELETE HTTP method; deletes all the clips for a given user.
 func DELETEAllClipData(ctx *gin.Context) {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": DatabaseErrType})
+		return
+	}
+
 	var val int64
 
 	if _, val = models.GetUserID(db, ctx.Param("username")); val == -1 {

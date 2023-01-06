@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/JammUtkarsh/cshare-server/models"
-	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/JammUtkarsh/cypherDecipher"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -24,7 +23,6 @@ type JWTClaim struct {
 
 // getJwtKey reads JWT_SECRET key from .env file and returns the secret in bytes.
 func getJwtKey() []byte {
-	utils.LoadEnv(".env")
 	return []byte(os.Getenv("JWT_SECRET"))
 
 }
@@ -44,12 +42,13 @@ func HashPassword(user models.Users) (password string, err error) {
 // CheckPassword removes salt from the provided password and verifies its hash.
 // Internally it uses a special library github.com/JammUtkarsh/cypherDecipher, to remove salt from the password.
 func CheckPassword(user models.Users) error {
-	db := models.CreateConnection()
+	db, err := models.CreateConnection()
 	defer models.CloseConnection(db)
-	var (
-		err              error
-		originalPassword string
-	)
+	if err != nil {
+		return err
+	}
+
+	var originalPassword string
 
 	if err, originalPassword = models.GetPasswordHash(db, user.Username); err != nil {
 		return err

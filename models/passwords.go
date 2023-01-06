@@ -32,4 +32,3 @@ func GetPasswordHash(db *sql.DB, username string) (err error, hash string) {
 	}
 	return nil, hash
 }
-
