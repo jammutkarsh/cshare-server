@@ -1,6 +1,10 @@
 name: continaer-release
 
-on: [push]
+on:
+  push:
+    branches: [main]
+    tags:
+      - "*"
 
 jobs:
   build:
