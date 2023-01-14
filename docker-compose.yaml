@@ -5,6 +5,7 @@ services:
     build:
       context: ./
       target: production
+    container_name: full_server
     ports:
       - 5675:5675
     restart: on-failure
@@ -17,7 +18,7 @@ services:
     build:
       context: ./
       target: database
-    container_name: full_db_postgres
+    container_name: full_database
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USERNAME}
@@ -29,7 +30,7 @@ services:
       - database_postgres:/var/lib/postgresql/data
     networks:
       - fullstack
-    restart: unless-stopped
+    restart: on-failure
 
 volumes:
   database_postgres:
