@@ -56,12 +56,12 @@ func GETClipData(ctx *gin.Context) {
 	}
 
 	clipID, _ := strconv.ParseInt(ctx.Param("clip_id"), 10, 64)
-	if count, _ := models.ClipCount(db, val); clipID > count {
+	if count, _ := models.ClipCount(db, val); clipID > count && clipID > 0 {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": resourceNotFoundErrType})
 		return
 	}
 
-	_, data := models.SelectClip(db, clipID, val)
+	data, _ := models.SelectClip(db, clipID, val)
 	ctx.JSON(http.StatusOK, data)
 }
 
