@@ -5,3 +5,4 @@ cshare-server
 error.logs
 .env
 coverage.out
+dist/
