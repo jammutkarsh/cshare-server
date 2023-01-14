@@ -7,10 +7,12 @@ package auth
 
 import (
 	"errors"
+	"log"
 	"os"
 	"time"
 
 	"github.com/JammUtkarsh/cshare-server/models"
+	"github.com/JammUtkarsh/cshare-server/utils"
 	"github.com/JammUtkarsh/cypherDecipher"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +25,7 @@ type jwtClaim struct {
 
 // getJwtKey reads JWT_SECRET key from .env file and returns the secret in bytes.
 func getJwtKey() []byte {
+	utils.LoadEnv(".env")
 	return []byte(os.Getenv("JWT_SECRET"))
 
 }
@@ -63,7 +66,13 @@ func CheckPassword(user models.Users) error {
 
 // GenerateJWT takes username as parameter and returns a JWT string and error if any.
 func GenerateJWT(username string) (tokenString string, err error) {
-	expirationTime := time.Now().Add(365 * time.Hour)
+	utils.LoadEnv(".env")
+	timeFactor, err := time.ParseDuration(os.Getenv("TIME_FACTOR"))
+	if err != nil {
+		timeFactor = 24
+		log.Println("TIME_FACTOR is invlaid or not set. Defaulting to 24 hours.")
+	}
+	expirationTime := time.Now().Add(timeFactor * time.Hour)
 
 	claims := &jwtClaim{
 		Username: username,

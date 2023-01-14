@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	insertClip = `INSERT INTO clip_stack ( userID, clipID, message, secret)
-VALUES ($1, $2, $3, $4) RETURNING clipID`
-	selectSingleClip = `SELECT clipID, message, secret FROM clip_stack WHERE clipID=$1 AND userID=$2`
-	deleteClips      = `DELETE FROM clip_stack WHERE userID=$1;`
-	countClips       = `SELECT COUNT (userID) FROM clip_stack WHERE userID=$1 ;`
+	insertClip = `INSERT INTO clip_stack ( userid, clipid, message, secret)
+VALUES ($1, $2, $3, $4) RETURNING clipid`
+	selectSingleClip = `SELECT clipid, message, secret FROM clip_stack WHERE clipid=$1 AND userid=$2`
+	deleteClips      = `DELETE FROM clip_stack WHERE userid=$1;`
+	countClips       = `SELECT COUNT (userid) FROM clip_stack WHERE userid=$1 ;`
 )
 
 // ClipCount returns the number of clips for a user. Returns -1 if the user doesn't exist or has 0 clips.
@@ -23,7 +23,7 @@ func ClipCount(db *sql.DB, userID int64) (count int64, err error) {
 	return count, nil
 }
 
-// InsertClip inserts a clip into the database and returns messageID.
+// InsertClip inserts a clip into the database and returns clipid.
 func InsertClip(db *sql.DB, c Data) (clipID int64, err error) {
 	if c.UserID, err = GetUserID(db, c.Username); err != nil {
 		return -1, err

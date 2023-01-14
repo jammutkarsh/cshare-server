@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/JammUtkarsh/cshare-server/utils"
 	// Importing postgres driver
 	_ "github.com/lib/pq"
 )
@@ -45,6 +46,7 @@ type Data struct {
 
 // getDBConfig reads .env file for database authentication.
 func getDBConfig() *dbConfig {
+	utils.LoadEnv(".env")
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
 	return &dbConfig{
 		Port:     dbPort,
