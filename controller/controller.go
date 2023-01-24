@@ -1,5 +1,11 @@
 package controller
 
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
 // controller package provides API endpoints for the application.
 // controller.go consists of common functionality used in the entire controller package.
 
@@ -12,3 +18,8 @@ const (
 	conflictErrType         = "username_already_exists"
 	databaseErrType         = "database_connection_error"
 )
+
+func HomepageHandler(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"message":"Welcome to cShare, a clipboard sharing service. Visit https://github.com/JammUtkarsh/cshare-server for more info"})
+	
+}

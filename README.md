@@ -1,24 +1,23 @@
 ![Logo](cshare.png)
 
-## Table Of Content
+## 📋 Table Of Content
 
-- [Table Of Content](#table-of-content)
-- [Overview](#overview)
-- [Status](#status)
-- [Digrams](#digrams)
-  - [Database ER Digram](#database-er-digram)
-- [Usage](#usage)
-  - [Starting the Server](#starting-the-server)
-  - [System Prerequisite](#system-prerequisite)
-  - [Running Locally](#running-locally)
-    - [Running database container](#running-database-container)
-    - [Running Go Code](#running-go-code)
-- [API Document](#api-document)
-- [Contribution](#contribution)
-- [Acknowledgement](#acknowledgement)
-- [License](#license)
+- [📋 Table Of Content](#-table-of-content)
+- [🔍 Overview](#-overview)
+- [🟢 Status](#-status)
+- [📊 Digrams](#-digrams)
+  - [🗄 Database ER Digram](#-database-er-digram)
+- [🔧 Usage](#-usage)
+  - [🛠 System Prerequisite](#-system-prerequisite)
+  - [🚀 Running Locally](#-running-locally)
+    - [💾 Starting the server database container](#-starting-the-server-database-container)
+    - [🏃‍♂️ Running The Application](#️-running-the-application)
+- [📚 API Documentation](#-api-documentation)
+- [🤝 Contribution](#-contribution)
+- [🙏 Acknowledgement](#-acknowledgement)
+- [📜 License](#-license)
 
-## Overview
+## 🔍 Overview
 
 cShare is a command-line utility built in Golang to send sensitive text data across devices. This repository is the backend server of cShare.
 
@@ -26,7 +25,7 @@ The back end is featured with
 
 - **RESTful API** for communication.
 - User **authentication** and **authorization**
-- Secured resource endpoints using **JSON Web Tokens (JWT)**
+- Secure resource endpoints using **JSON Web Tokens (JWT)**
 - **Single-file** binary.
 - **Containerized** environment for portability and scalability.
 - **API documentation** using [Postman](https://www.postman.com/)
@@ -42,23 +41,34 @@ Framework used
 - [Gin](https://github.com/gin-gonic/gin) framework is the primary tool for building RESTful APIs.
 - [cypherDecipher](https://github.com/jammutkarsh/cypherDecipher) for password salting and un-salting.
 
-## Status
+## 🟢 Status
 
 > The backend (this project) is at stable version v1. It provides basic API endpoints for daily use.
 > The official frontend command-line application is currently in development.
 > You can also build your custom frontend(GUI, CLI or TUI) on top of this backend by following the docuementations.
 
-## Digrams
+## 📊 Digrams
 
-### Database ER Digram
+### 🗄 Database ER Digram
 
 Refer ER digrams [here](doc/schema/README.md)
 
-## Usage
+<!-- TODO: API Digram -->
+
+## 🔧 Usage
 
 Before you ping the endpoints, Follow the steps to setup the inital configuration of the application.
 
-### Starting the Server
+### 🛠 System Prerequisite
+
+- [Docker](https://www.docker.com/)
+- [Go](https://go.dev/)
+- [Postman](https://www.postman.com/)
+- [PostgresSQL](https://www.postgresql.org/) (optional)
+
+**NOTE: The entire application was developed only using Go and Docker installed in the system. PostgreSQL databases were running in Docker containers.**
+
+### 🚀 Running Locally
 
 1. Clone the repository [JammUtkarsh/cshare-server](https://github.com/JammUtkarsh/cshare-server)
 
@@ -78,18 +88,7 @@ cd cshare-server
 cp .env.local .env 
 ```
 
-### System Prerequisite
-
-- [Docker](https://www.docker.com/)
-- [Go](https://go.dev/)
-- [Postman](https://www.postman.com/)
-- [PostgresSQL](https://www.postgresql.org/) (optional)
-
-**NOTE: The entire application was developed only using Go and Docker installed in the system. PostgreSQL databases were running in Docker containers.**
-
-### Running Locally
-
-#### Running database container
+#### 💾 Starting the server database container
 
 **A.** Using `docker-compose`
 
@@ -115,7 +114,7 @@ docker build -t cshare-db --target=database .
 docker run --rm -p 5432:5432 -v pgdata:/var/lib/postgresql/data cshare-db
 ```
 
-#### Running Go Code
+#### 🏃‍♂️ Running The Application
 
 ```bash
 go run .
@@ -123,21 +122,21 @@ go run .
 
 The server will be now be accessable on port `:5675` or as per the `.env` file
 
-## API Document
+## 📚 API Documentation
 
 See [Postman API Documentation](https://documenter.getpostman.com/view/19332599/2s8YszQqbU)
 
 Use `Run In Postman` on *top right corner* for best experience.
 
-## Contribution
+## 🤝 Contribution
 
 This project is for learning purposes. Although you still can open issues if you find any.
 If possible, mention minimum amount of steps to reproduce the issue in the [issue tab](https://github.com/JammUtkarsh/cshare-server/issues)
 
-## Acknowledgement
+## 🙏 Acknowledgement
 
 I would like to give special thanks to the Go community, especially the [Discord Community](https://discord.gg/golang)
 
-## License
+## 📜 License
 
 cShare is [MIT Licensed](https://github.com/JammUtkarsh/cshare-server/blob/main/LICENSE.md)

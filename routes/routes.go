@@ -25,6 +25,7 @@ var Routes = func() {
 	basePath := router.Group("/v1")
 	RegisterUserRoutes(basePath)
 	log.Fatalln(router.Run(":" + os.Getenv("SERVER_PORT")))
+	router.GET("/", controller.HomepageHandler)
 }
 
 // RegisterUserRoutes defines endpoints of the server.
