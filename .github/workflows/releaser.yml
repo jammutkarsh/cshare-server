@@ -2,7 +2,6 @@ name: Binary and container release
 
 on:
   push:
-    branches: [main]
     tags:
       - "*"
 
