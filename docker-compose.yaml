@@ -11,8 +11,6 @@ services:
     restart: on-failure
     depends_on:
       - postgres-db
-    networks:
-      - fullstack
 
   postgres-db:
     build:
@@ -28,14 +26,7 @@ services:
       - '5432:5432'
     volumes:
       - database_postgres:/var/lib/postgresql/data
-    networks:
-      - fullstack
     restart: on-failure
 
 volumes:
   database_postgres:
-
-
-networks:
-  fullstack:
-    driver: bridge

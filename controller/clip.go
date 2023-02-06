@@ -18,17 +18,18 @@ import (
 // POSTClipData is POST HTTP method; For a given user with a valid clips JSON and stores it in DB.
 // returns appropriate response with status code.
 func POSTClipData(ctx *gin.Context) {
-	db, err := models.CreateConnection()
-	defer models.CloseConnection(db)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
-		return
-	}
 	var userData models.Data
 	userData.Username = ctx.Param("username")
 
 	if err := ctx.BindJSON(&userData); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
+		return
+	}
+	
+	db, err := models.CreateConnection()
+	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
 		return
 	}
 
