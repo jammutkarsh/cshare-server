@@ -18,20 +18,20 @@ import (
 
 // POSTCreateUser is POST HTTP method; accepts a user entry in the database for a given valid JSON.
 func POSTCreateUser(ctx *gin.Context) {
-	db, err := models.CreateConnection()
-	defer models.CloseConnection(db)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
-		return
-	}
-
 	var (
 		user           models.Users
 		hashedPassword string
 	)
 
-	if err = ctx.BindJSON(&user); err != nil {
+	if err := ctx.BindJSON(&user); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
+		return
+	}
+
+	db, err := models.CreateConnection()
+	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
 		return
 	}
 
@@ -55,20 +55,20 @@ func POSTCreateUser(ctx *gin.Context) {
 
 // POSTLogin is POST HTTP method, validates credentials of an existing user and returns a JWT.
 func POSTLogin(ctx *gin.Context) {
-	db, err := models.CreateConnection()
-	defer models.CloseConnection(db)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
-		return
-	}
-
 	var (
 		user        models.Users
 		tokenString string
 	)
 
-	if err = ctx.ShouldBindJSON(&user); err != nil {
+	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": formatValidationErrType})
+		return
+	}
+
+	db, err := models.CreateConnection()
+	defer models.CloseConnection(db)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": databaseErrType})
 		return
 	}
 
