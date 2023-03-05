@@ -6,7 +6,6 @@
 - [🔍 Overview](#-overview)
 - [🟢 Status](#-status)
 - [📊 Digrams](#-digrams)
-  - [🗄 Database ER Digram](#-database-er-digram)
 - [🔧 Usage](#-usage)
   - [🛠 System Prerequisite](#-system-prerequisite)
   - [🚀 Running Locally](#-running-locally)
@@ -49,9 +48,7 @@ Framework used
 
 ## 📊 Digrams
 
-### 🗄 Database ER Digram
-
-Refer ER digrams [here](doc/schema/README.md)
+Check [here](doc/schema/README.md).
 
 <!-- TODO: API Digram -->
 
