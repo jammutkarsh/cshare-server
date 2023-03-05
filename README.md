@@ -48,7 +48,7 @@ Framework used
 
 ## 📊 Digrams
 
-Check [here](doc/schema/README.md).
+Check [here](doc/README.md).
 
 <!-- TODO: API Digram -->
 
